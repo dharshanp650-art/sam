@@ -30,6 +30,24 @@
     object-position: center;
     background: #000;
 }
+.container-1 .cloud-bg-image{
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: #000;
+}
+@media (max-width:640px){
+    .container-1 .cloud-bg-video{
+        display: none;
+    }
+    .container-1 .cloud-bg-image{
+        display: block;
+    }
+}
 .container-1 .cloud-heading{
     position: absolute;
     inset: 0;
@@ -194,6 +212,7 @@
           <div class="container-1">
             <div class="cloud-bg" id="cloudBg">
               <video class="cloud-bg-video" src="artistcloudvideo.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
+              <img class="cloud-bg-image" src="artistcloud2.jpeg" alt="" aria-hidden="true">
             </div>
           </div>
         </div>
@@ -205,10 +224,7 @@
     <section class="studio-section" id="studioSection">
       <div class="studio-container">
         <div class="studio-image-wrapper">
-          <picture>
-            <source media="(max-width:640px)" srcset="artistcloud2.jpeg">
-            <img src="artistcloud.png" alt="Samantha Ellis with dog in studio" class="studio-image">
-          </picture>
+          <img src="artistcloud.png" alt="Samantha Ellis with dog in studio" class="studio-image">
         </div>
         <div class="studio-content">
           <h2 class="studio-title">Inside The Studio</h2>
