@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Commission — SAMANTHA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      /* Header - Match contact page header */
+      .site-header {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      }
+
+      .site-header .logo {
+        color: var(--fg) !important;
+      }
+
+      .site-header .nav-left a,
+      .site-header .nav-right a {
+        color: var(--fg) !important;
+      }
+
+      .site-header .icon-btn {
+        color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-toggle {
+        color: var(--fg) !important;
+        border-bottom-color: transparent !important;
+      }
+
+      .site-header .dropdown-toggle:hover {
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown.active .dropdown-toggle {
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-toggle::after {
+        border-right-color: var(--fg) !important;
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-menu a {
+        color: var(--fg) !important;
+      }
+
+      /* Commission Form Section - Website Theme */
+      .commission-form-section {
+        padding: 120px 60px 80px;
+        background: var(--bg);
+        min-height: 100vh;
+        position: relative;
+      }
+
+      .commission-form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+
+      .commission-form-title {
+        font-size: clamp(2.8rem, 6.5vw, 4.2rem);
+        font-weight: 600;
+        color: var(--fg);
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Georgia', serif;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        line-height: 1.1;
+      }
+
+      .commission-form-subtitle {
+        font-size: 1.08rem;
+        color: var(--muted);
+        text-align: center;
+        margin-bottom: 60px;
+        line-height: 1.65;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 300;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        margin-bottom: 60px;
+      }
+
+      .form-group {
+        margin-bottom: 35px;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 20px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.85;
+      }
+
+      .form-input, .form-textarea {
+        width: 100%;
+        padding: 18px 22px;
+        border: 2px solid rgba(0,0,0,0.1);
+        border-radius: 0;
+        font-size: 1rem;
+        color: var(--fg);
+        font-family: inherit;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: rgba(0,0,0,0.3);
+        box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+        background: #ffffff;
+      }
+
+      .form-input::placeholder, .form-textarea::placeholder {
+        color: var(--muted);
+      }
+
+      .form-textarea {
+        min-height: 140px;
+        resize: vertical;
+      }
+
+      .radio-grid, .checkbox-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .radio-option, .checkbox-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        padding: 20px 24px;
+        border: 2px solid rgba(0,0,0,0.08);
+        border-radius: 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(5px);
+      }
+
+      .radio-option:hover, .checkbox-option:hover {
+        background: rgba(255,255,255,0.9);
+        border-color: rgba(0,0,0,0.2);
+        transform: translateX(8px);
+      }
+
+      .radio-option input, .checkbox-option input {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+        accent-color: var(--fg);
+        cursor: pointer;
+      }
+
+      .radio-option span, .checkbox-option span {
+        cursor: pointer;
+        font-size: 1rem;
+        color: var(--fg);
+        font-weight: 400;
+        line-height: 1.5;
+      }
+
+      .form-submit-btn {
+        width: 100%;
+        padding: 18px 52px;
+        background: var(--fg);
+        color: var(--bg);
+        border: 2px solid var(--fg);
+        font-size: 0.88rem;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-radius: 0;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        margin-top: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+      }
+
+      .form-submit-btn:hover {
+        background: transparent;
+        color: var(--fg);
+        border-color: var(--fg);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .commission-form-section {
+          padding: 100px 40px 60px;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .commission-form-section {
+          padding: 80px 20px 40px;
+        }
+
+        .commission-form-title {
+          font-size: 2.5rem;
+        }
+
+        .commission-form-subtitle {
+          font-size: 1.1rem;
+        }
+
+        .form-grid {
+          gap: 30px;
+        }
+
+        .radio-option, .checkbox-option {
+          padding: 16px 20px;
+        }
+
+        .radio-option span, .checkbox-option span {
+          font-size: 0.95rem;
+        }
+
+        .form-submit-btn {
+          padding: 16px 32px;
+          font-size: 0.82rem;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .commission-form-section {
+          padding: 60px 16px 30px;
+        }
+
+        .commission-form-title {
+          font-size: 1.8rem;
+          margin-bottom: 15px;
+          margin-top: 80px;
+        }
+
+        .commission-form-subtitle {
+          font-size: 0.95rem;
+          margin-bottom: 40px;
+        }
+
+        .form-grid {
+          gap: 25px;
+          margin-bottom: 40px;
+        }
+
+        .form-group {
+          margin-bottom: 25px;
+        }
+
+        .form-label {
+          font-size: 0.85rem;
+          margin-bottom: 15px;
+        }
+
+        .radio-option, .checkbox-option {
+          padding: 14px 16px;
+          gap: 14px;
+        }
+
+        .radio-option span, .checkbox-option span {
+          font-size: 0.9rem;
+        }
+
+        .form-submit-btn {
+          padding: 14px 24px;
+          font-size: 0.75rem;
+          margin-top: 35px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <button class="hamburger-menu" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-left">
+        <a href="shop-collection.html">GALLERY</a>
+        <a href="blog.html">BLOG</a>
+      </nav>
+      <div class="logo"><a href="index.html"><img src="logo-header.png" alt="Samantha Logo"></a></div>
+      <nav class="nav-right">
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+        <button class="icon-btn cart-icon-btn" aria-label="Cart">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"/>
+            <path d="M6.2 9h11.6l0.9 10.4a3 3 0 0 1-3 3.3H8.3a3 3 0 0 1-3-3.3L6.2 9Z"/>
+            <path d="M8.7 12.4a3.3 3.3 0 0 0 6.6 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu -->
+      <nav class="mobile-menu">
+        <a href="shop-collection.html">COLLECTIONS</a>
+        <a href="blog.html">BLOG</a>
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+      </nav>
+    </header>
+
+    <!-- Commission Form -->
+    <section class="commission-form-section" id="commission-form">
+      <div class="commission-form-container">
+        <h2 class="commission-form-title">Create Your Commission</h2>
+        <p class="commission-form-subtitle">Tell me about your special moment, and I'll bring it to life on canvas</p>
+
+        <form id="commissionForm" action="/submit_commission" method="post">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Choose Your Size</label>
+              <div class="radio-grid">
+                <label class="radio-option">
+                  <input type="radio" name="size" value="20 × 20 cm (7.87&quot; × 7.87&quot;)" required>
+                  <span>20 × 20 cm (7.87" × 7.87")</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="size" value="30 × 30 cm (12&quot; × 12&quot;)">
+                  <span>30 × 30 cm (12" × 12")</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="size" value="40 × 40 cm (16&quot; × 16&quot;)">
+                  <span>40 × 40 cm (16" × 16")</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="size" value="50 × 50 cm (20&quot; × 20&quot;)">
+                  <span>50 × 50 cm (20" × 20")</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="size" value="60 × 60 cm (24&quot; × 24&quot;)">
+                  <span>60 × 60 cm (24" × 24")</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="size" value="100 × 100 cm (39&quot; × 39&quot;)">
+                  <span>100 × 100 cm (39" × 39")</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="size" value="120 × 120 cm (47&quot; × 47&quot;)">
+                  <span>120 × 120 cm (47" × 47")</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">What Would You Like Featured?</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-option">
+                  <input type="checkbox" name="features" value="Stars">
+                  <span>Stars (mapped exactly as they appeared on your special date)</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="features" value="Clouds">
+                  <span>Clouds (soft and dreamlike)</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="features" value="Landscape">
+                  <span>Landscape Elements (e.g., horizon line, silhouettes, mountains, sea)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tell Me Your Special Day</label>
+              <input type="date" name="specialDate" class="form-input" placeholder="📅 Select your special date" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Canvas Type</label>
+              <div class="radio-grid">
+                <label class="radio-option">
+                  <input type="radio" name="canvas" value="Handmade" required>
+                  <span>Handmade Canvas – crafted in the studio for a fully bespoke finish</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="canvas" value="Premium">
+                  <span>Premium Pre-Stretched Canvas – high-quality bought canvas</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Extra Details</label>
+              <textarea name="extraDetails" class="form-textarea" placeholder="✏️ Is there a specific colour palette, mood, or story you'd like me to capture?"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Deadline (Optional)</label>
+              <input type="date" name="deadline" class="form-input" placeholder="📅 Do you need the painting by a specific date?">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Your Contact Info</label>
+              <input type="text" name="name" class="form-input" placeholder="Your Name" required>
+              <input type="email" name="email" class="form-input" placeholder="Your Email" required>
+              <input type="tel" name="phone" class="form-input" placeholder="Phone (optional)">
+            </div>
+          </div>
+
+          <button type="submit" class="form-submit-btn">SUBMIT COMMISSION REQUEST</button>
+        </form>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+      // Commission Form Submission
+      const commissionForm = document.getElementById('commissionForm');
+
+      if (commissionForm) {
+        commissionForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(commissionForm);
+
+          try {
+            const response = await fetch('/submit_commission', {
+              method: 'POST',
+              body: formData
+            });
+
+            if (response.ok) {
+              alert('Thank you for your commission request! We\'ll be in touch soon.');
+              commissionForm.reset();
+            } else {
+              const errorText = await response.text();
+              alert(`There was an error submitting your request: ${errorText}`);
+            }
+          } catch (error) {
+            alert(`Network error: ${error.message}`);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

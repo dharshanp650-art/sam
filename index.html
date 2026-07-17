@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SAMANTHA — Original Art & Fine Prints</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>*{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Lato',sans-serif;
+}
+
+.container-1{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.container-1 .cloud-bg{
+    position: absolute;
+    inset: 0;
+}
+.container-1 .cloud-bg-video{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: #000;
+}
+.container-1 .cloud-heading{
+    position: absolute;
+    inset: 0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 18px;
+    padding: 40px;
+}
+.container-1 .cloud-eyebrow{
+    margin: 0;
+    color: rgba(255,255,255,0.85);
+    font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    transform: translateY(16px);
+    animation: cloudTextIn 0.9s ease-out 0.15s forwards;
+}
+.container-1 h2{
+    margin: 0;
+    max-width: 900px;
+    color: #ffffff;
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', serif;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.45);
+    opacity: 0;
+    transform: translateY(16px);
+    animation: cloudTextIn 0.9s ease-out 0.35s forwards;
+}
+@keyframes cloudTextIn{
+    from{ opacity: 0; transform: translateY(16px); }
+    to{ opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce){
+    .container-1 .cloud-eyebrow,
+    .container-1 h2{
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+.cloud{
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    overflow: hidden;
+}
+.cloud img{
+    animation: cld calc(8s * var(--i)) linear infinite;
+    opacity: .6;
+    max-width: 100%;
+    position: absolute;
+    bottom: 0px;
+}
+@media (max-width: 640px) {
+    .cloud {
+        max-width: 100%;
+    }
+    .cloud img {
+        max-width: 120%;
+        height: auto;
+        min-height: 60px;
+    }
+}
+@keyframes cld{
+    0%{
+        transform: translateX(-100%);
+    }
+    100%{
+        transform: translateX(100%);
+    }
+}
+
+.container-2{
+    width: 50%;
+    margin: 20px auto;
+}
+.container-2 h4{
+   text-align: center;
+   color: gray;
+   font-size: 18px;
+   padding-top: 20px;
+}
+.container-2 p{
+    
+    color: rgb(151, 151, 151);
+    font-size: 14px;
+    line-height: 25px;
+    padding-top: 20px;
+ }
+
+</style>
+  </head>
+  <body>
+    <header class="site-header">
+      <button class="hamburger-menu" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-left">
+        <a href="shop-collection.html">GALLERY</a>
+        <a href="blog.html">BLOG</a>
+      </nav>
+      <div class="logo"><img src="logo-header.png" alt="Samantha Logo"></div>
+      <nav class="nav-right">
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+        <button class="icon-btn cart-icon-btn" aria-label="Cart">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"/>
+            <path d="M6.2 9h11.6l0.9 10.4a3 3 0 0 1-3 3.3H8.3a3 3 0 0 1-3-3.3L6.2 9Z"/>
+            <path d="M8.7 12.4a3.3 3.3 0 0 0 6.6 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu -->
+      <nav class="mobile-menu">
+        <a href="shop-collection.html">COLLECTIONS</a>
+        <a href="blog.html">BLOG</a>
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+      </nav>
+    </header>
+
+    <!-- Hero / Quote / Artistcloud combined fade section -->
+    <section class="hero-fade-section" id="heroFadeSection">
+      <div class="hero hero-sticky">
+
+        <div class="fade-layer video-layer" id="videoLayer">
+          <video class="hero-video" autoplay muted playsinline loop aria-hidden="true">
+            <source src="214784_medium.mp4" type="video/mp4">
+          </video>
+          <div class="hero-overlay">
+            <div class="hero-content">
+              <h1 class="hero-heading">Original Oil Painting by Samantha Ellis</h1>
+              <p class="hero-paragraph">The sky remembers every act of courage. Art helps us listen.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="fade-layer quote-overlay" id="quoteLayer">
+          <div class="quote-content-inner">
+            <p class="quote-text">"The sky remembers every act of courage. Art helps us listen."</p>
+            <p class="quote-author">— Samantha Ellis</p>
+          </div>
+        </div>
+
+        <div class="fade-layer cloud-layer" id="cloudLayer">
+          <div class="container-1">
+            <div class="cloud-bg" id="cloudBg">
+              <video class="cloud-bg-video" src="artistcloudvideo.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Inside The Studio Section -->
+    <section class="studio-section" id="studioSection">
+      <div class="studio-container">
+        <div class="studio-image-wrapper">
+          <picture>
+            <source media="(max-width:640px)" srcset="artistcloud2.jpeg">
+            <img src="artistcloud.png" alt="Samantha Ellis with dog in studio" class="studio-image">
+          </picture>
+        </div>
+        <div class="studio-content">
+          <h2 class="studio-title">Inside The Studio</h2>
+          <p class="studio-text">Samantha Ellis is a landscape artist based in Northamptonshire who maps skies, star charts and weather data into oil paintings that hold stories.</p>
+          <p class="studio-text">Each piece is a moment of history painted into the sky. Scroll to see available originals and commissions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Works Section -->
+    <section class="featured-works-section">
+      <div class="gallery-header">
+        <h2>NEW</h2>
+      </div>
+
+      <div class="featured-carousel-wrapper">
+        <button class="featured-carousel-btn featured-prev" id="featuredPrevBtn" aria-label="Previous">‹</button>
+        
+        <div class="featured-carousel">
+          <div class="product-card" data-product-id="ifoundit" data-artist="Samantha Ellis" data-frame="black" data-price="769">
+            <div class="product-frame frame-dark">
+              <img src="ihavefoundit.webp" alt="I Found It">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">I Found It (2022)</p>
+              <p class="product-price">£769</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="bliss" data-artist="Samantha Ellis" data-frame="black" data-price="769">
+            <div class="product-frame frame-dark">
+              <img src="bliss.png" alt="Bliss">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Bliss (2019)</p>
+              <p class="product-price">£769</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="findmethemoon" data-artist="Samantha Ellis" data-frame="black" data-price="330">
+            <div class="product-frame frame-dark">
+              <img src="find me the moon (2022).webp" alt="Find Me the Moon">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Find Me the Moon (2022)</p>
+              <p class="product-price">£330</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="fordad" data-artist="Samantha Ellis" data-frame="black" data-price="769">
+            <div class="product-frame frame-dark">
+              <img src="fordad.webp" alt="For Dad">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">For Dad (2021)</p>
+              <p class="product-price">£769</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="beyondwords" data-artist="Samantha Ellis" data-frame="black" data-price="300">
+            <div class="product-frame frame-dark">
+              <img src="beyond words (2019).webp" alt="Beyond Words">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Beyond Words (2019)</p>
+              <p class="product-price">£300</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="wehope" data-artist="Samantha Ellis" data-frame="black" data-price="260">
+            <div class="product-frame frame-dark">
+              <img src="we can only hope.png" alt="We Hope">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">We Hope (2020)</p>
+              <p class="product-price">£260</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="candyclouds" data-artist="Samantha Ellis" data-frame="black" data-price="380">
+            <div class="product-frame frame-dark">
+              <img src="candy floss clouds (2019).webp" alt="Candy Clouds">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Candy Floss Clouds (2019)</p>
+              <p class="product-price">£380</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="featured-carousel-btn featured-next" id="featuredNextBtn" aria-label="Next">›</button>
+      </div>
+       <!-- Quick View Modal -->
+      <div class="modal-overlay" id="quickViewModal">
+        <div class="quick-view-modal">
+          <button class="modal-close" id="closeModal">&times;</button>
+          <div class="modal-image-section">
+            <img src="" alt="Product" class="modal-product-image" id="modalProductImage">
+            <div class="modal-nav-buttons">
+              <button class="modal-nav-btn modal-prev" id="modalPrevBtn">‹</button>
+              <button class="modal-nav-btn modal-next" id="modalNextBtn">›</button>
+            </div>
+          </div>
+          <div class="modal-info-section">
+            <p class="modal-artist-name" id="modalArtistName"></p>
+            <h3 class="modal-product-title" id="modalProductTitle"></h3>
+            <p class="modal-price" id="modalPrice"></p>
+            
+            <div class="modal-options">
+              <div class="option-group">
+                <label>Size</label>
+                <select class="option-select" id="sizeSelect">
+                  <option>20cm x 30cm</option>
+                  <option>30cm x 40cm</option>
+                  <option>40cm x 60cm</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label>Frame</label>
+                <select class="option-select" id="frameSelect">
+                  <option>Black</option>
+                  <option>White</option>
+                  <option>Gold</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-quantity">
+              <button class="qty-btn" id="qtyMinus">−</button>
+              <input type="number" value="1" min="1" id="qtyInput" class="qty-input">
+              <button class="qty-btn" id="qtyPlus">+</button>
+            </div>
+
+            <button class="modal-add-to-cart" id="addToCartBtn">Add To Cart</button>
+
+            <p class="modal-description" id="modalDescription"></p>
+          </div>
+        </div>
+      </div>
+
+<div class="gallery-footer">
+        <button class="shop-button">Shop New</button>
+      </div>
+
+    </section>
+
+    <section class="artist-showcase-section" id="artist-section">
+      <div class="showcase-container">
+        <div class="artist-image-container">
+          <img src="artist.jpg" alt="Meet Samantha, Contemporary Painter" class="artist-photo">
+        </div>
+        <div class="showcase-content artist-content">
+          <div class="artist-label">MEET THE ARTIST</div>
+          <h2 class="showcase-title">SAMANTHA</h2>
+          <p class="showcase-description">Meet Samantha, a contemporary painter whose work captures the essence of light and emotion. Her paintings transport viewers to serene landscapes and intimate moments, making art accessible and meaningful for everyone.</p>
+          <a href="artist-profile.html" class="learn-more-btn">LEARN MORE</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="trending-works-wrapper">
+    <section class="trending-works-section">
+      <div class="gallery-header">
+        <h2>TRENDING</h2>
+      </div>
+
+      <div class="trending-carousel-wrapper">
+        <button class="trending-carousel-btn trending-prev" id="trendingPrevBtn" aria-label="Previous">‹</button>
+        
+        <div class="trending-carousel">
+          <div class="product-card" data-product-id="ifoundit" data-artist="Samantha Ellis" data-frame="black" data-price="769">
+            <div class="product-frame frame-dark">
+              <img src="ihavefoundit.webp" alt="I Found It">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">I Found It (2022)</p>
+              <p class="product-price">£769</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="bliss" data-artist="Samantha Ellis" data-frame="black" data-price="769">
+            <div class="product-frame frame-dark">
+              <img src="bliss.png" alt="Bliss">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Bliss (2019)</p>
+              <p class="product-price">£769</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="findmethemoon" data-artist="Samantha Ellis" data-frame="black" data-price="330">
+            <div class="product-frame frame-dark">
+              <img src="find me the moon (2022).webp" alt="Find Me the Moon">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Find Me the Moon (2022)</p>
+              <p class="product-price">£330</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="fordad" data-artist="Samantha Ellis" data-frame="black" data-price="769">
+            <div class="product-frame frame-dark">
+              <img src="fordad.webp" alt="For Dad">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">For Dad (2021)</p>
+              <p class="product-price">£769</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="beyondwords" data-artist="Samantha Ellis" data-frame="black" data-price="300">
+            <div class="product-frame frame-dark">
+              <img src="beyond words (2019).webp" alt="Beyond Words">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Beyond Words (2019)</p>
+              <p class="product-price">£300</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="wehope" data-artist="Samantha Ellis" data-frame="black" data-price="260">
+            <div class="product-frame frame-dark">
+              <img src="we can only hope.png" alt="We Hope">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">We Hope (2020)</p>
+              <p class="product-price">£260</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="candyclouds" data-artist="Samantha Ellis" data-frame="black" data-price="380">
+            <div class="product-frame frame-dark">
+              <img src="candy floss clouds (2019).webp" alt="Candy Clouds">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Candy Floss Clouds (2019)</p>
+              <p class="product-price">£380</p>
+            </div>
+          </div>
+
+          <div class="product-card" data-product-id="findmethemoon-alt" data-artist="Samantha Ellis" data-frame="black" data-price="330">
+            <div class="product-frame frame-dark">
+              <img src="find me the moon (2022).webp" alt="Find Me the Moon">
+              <div class="quick-view"><button>QUICK VIEW</button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-title">Find Me the Moon (2022)</p>
+              <p class="product-price">£330</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="trending-carousel-btn trending-next" id="trendingNextBtn" aria-label="Next">›</button>
+      </div>
+
+      <div class="gallery-footer">
+        <button class="shop-button">Shop Trending</button>
+      </div>
+
+      <!-- Trending Quick View Modal -->
+      <div class="modal-overlay" id="trendingQuickViewModal">
+        <div class="quick-view-modal">
+          <button class="modal-close" id="trendingCloseModal">&times;</button>
+          <div class="modal-image-section">
+            <img src="assets/product.jpg" alt="Product" class="modal-product-image" id="trendingModalProductImage">
+            <div class="modal-nav-buttons">
+              <button class="modal-nav-btn modal-prev">‹</button>
+              <button class="modal-nav-btn modal-next">›</button>
+            </div>
+          </div>
+          <div class="modal-info-section">
+            <p class="modal-artist-name" id="trendingModalArtistName">Samantha Ellis</p>
+            <h3 class="modal-product-title" id="trendingModalProductTitle">Product Title</h3>
+            <p class="modal-price" id="trendingModalPrice">£0.00</p>
+            
+            <div class="modal-options">
+              <div class="option-group">
+                <label>Size</label>
+                <select class="option-select" id="trendingSizeSelect">
+                  <option>20cm x 30cm</option>
+                  <option>30cm x 40cm</option>
+                  <option>40cm x 60cm</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label>Frame</label>
+                <select class="option-select" id="trendingFrameSelect">
+                  <option>Black</option>
+                  <option>White</option>
+                  <option>Gold</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-quantity">
+              <button class="qty-btn" id="trendingQtyMinus">−</button>
+              <input type="number" value="1" min="1" id="trendingQtyInput" class="qty-input">
+              <button class="qty-btn" id="trendingQtyPlus">+</button>
+            </div>
+
+            <button class="modal-add-to-cart" id="trendingAddToCartBtn">Add To Cart</button>
+
+            <p class="modal-description" id="trendingModalDescription">Product description goes here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="trending-hold-spacer"></div>
+    </div>
+
+    <!-- Custom Commission Section -->
+    <section class="commission-section" id="commission-section">
+      <video class="commission-video-bg" autoplay muted playsinline loop aria-hidden="true">
+        <source src="90877-629483574.mp4" type="video/mp4">
+      </video>
+      <div class="commission-overlay"></div>
+      <div class="commission-container">
+        <div class="commission-content">
+          <h2 class="commission-title">Your Sky, Your Story</h2>
+          <p class="commission-subtitle">Commission a one-of-a-kind painting of the stars and clouds from your special day.</p>
+          <p class="commission-description">Every sky holds a story. I paint the stars and clouds as they appeared in the moments that matter most to you.</p>
+          
+          <a href="commission.html" class="commission-cta-btn">START YOUR COMMISSION</a>
+        </div>
+      </div>
+
+    </section>
+    <!-- Cart Page Modal -->
+    <div id="cartModal" class="cart-modal">
+      <button id="closeCartBtn" class="close-cart-btn">✕</button>
+      <div class="cart-container">
+        <div class="cart-left">
+          <h1>Shopping Cart</h1>
+          <div class="cart-table-header">
+            <div class="col-product">Product</div>
+            <div class="col-price">Price</div>
+            <div class="col-quantity">Quantity</div>
+            <div class="col-total">Total</div>
+          </div>
+          <div id="cartItems" class="cart-items">
+            <p class="empty-cart">Your cart is empty</p>
+          </div>
+        </div>
+        <div class="cart-right">
+          <p class="free-shipping">Congratulations! Your order qualified for free shipping</p>
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="cartTotal">$0.00</span>
+            </div>
+            <p class="summary-note">Excluding taxes and shipping</p>
+          </div>
+          <div class="order-notes">
+            <label>Order Notes</label>
+            <textarea id="orderNotes" placeholder="Add any special instructions or notes here..."></textarea>
+          </div>
+          <label class="terms-checkbox">
+            <input type="checkbox" id="termsCheck">
+            <span>I agree with the terms and conditions</span>
+          </label>
+          <button class="checkout-btn">CHECKOUT</button>
+          <button class="continue-shopping-btn">CONTINUE SHOPPING</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

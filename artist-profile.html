@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Samantha - Artist Profile - SAMANTHA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      /* Match collection/shop header appearance */
+      .site-header {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      }
+
+      .site-header .logo {
+        color: var(--fg) !important;
+      }
+
+      .site-header .nav-left a,
+      .site-header .nav-right a {
+        color: var(--fg) !important;
+      }
+
+      .site-header .icon-btn {
+        color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-toggle {
+        color: var(--fg) !important;
+        border-bottom-color: transparent !important;
+      }
+
+      .site-header .dropdown-toggle:hover {
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown.active .dropdown-toggle {
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-toggle::after {
+        border-right-color: var(--fg) !important;
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-menu a {
+        color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-menu a::before {
+        background: var(--fg) !important;
+      }
+
+      .artist-profile-page {
+        min-height: 100vh;
+        padding: 100px 60px 60px;
+        background: var(--bg);
+      }
+      .artist-profile-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+      .artist-profile-header h1 {
+        font-size: 3rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-family: 'Georgia', serif;
+        margin-bottom: 20px;
+      }
+      .artist-profile-header p {
+        font-size: 1.1rem;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+      .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--fg);
+        text-decoration: none;
+        font-size: 0.9rem;
+        letter-spacing: 0.1em;
+        margin-bottom: 40px;
+        transition: all 0.3s ease;
+      }
+      .back-button:hover {
+        gap: 12px;
+      }
+      .artist-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .artist-image-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        background: linear-gradient(135deg, #fef5e7 0%, #f9e79f 100%);
+        border-radius: 12px;
+        padding: 40px;
+        border: 8px solid #8b4513;
+      }
+      .artist-info-section h2 {
+        font-size: 2.5rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-family: 'Georgia', serif;
+        margin-bottom: 16px;
+      }
+      .artist-title {
+        font-size: 1.4rem;
+        color: #d4af37;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 24px;
+      }
+      .artist-bio {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: var(--muted);
+        margin-bottom: 32px;
+      }
+      /* Use site-wide button style for consistency */
+      .artist-info-section .learn-more-btn{display:inline-block}
+      /* Sky reveal and quote animations */
+      .sky-reveal { position: relative; width: 100%; max-width: 520px; height: 420px; border-radius: 8px; overflow: hidden; }
+      .sky-image{width:100%;height:100%;display:block;object-fit:cover;border-radius:8px;opacity:0;transform-origin:center center;animation:skyFadeIn 2.4s ease forwards, skySlowZoom 20s ease-in-out 2.4s infinite alternate}
+      .alt-image{width:100%;height:380px;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,0.12);overflow:hidden}
+      .alt-image img{width:100%;height:100%;object-fit:cover;display:block}
+      .alt-image{position:relative}
+      .image-overlay{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.6) 100%);color:#fff;font-size:0.95rem;opacity:0;transform:translateY(8px);transition:all 0.28s ease}
+      .alt-image:hover .image-overlay,.alt-image:focus-within .image-overlay{opacity:1;transform:translateY(0)}
+      .quote-overlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);color:#fff;padding:40px;opacity:0;transform:translateY(20px);transition:all 0.4s ease;backdrop-filter:blur(8px)}
+      .alt-image:hover .quote-overlay{opacity:1;transform:translateY(0)}
+      .quote-content{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+      .quote-text{font-size:1.3rem;font-style:italic;line-height:1.4;margin:0}
+      .quote-author{font-size:0.95rem;font-style:normal;letter-spacing:0.05em;margin:0}
+
+      /* Lightbox */
+      .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(3,8,18,0.8);z-index:200}
+      .lightbox.active{display:flex}
+      .lightbox-content{max-width:90vw;max-height:90vh;position:relative;display:flex;flex-direction:column;align-items:center}
+      .lightbox-content img{width:auto;max-width:100%;max-height:80vh;display:block;border-radius:6px}
+      .lightbox-caption{color:rgba(255,255,255,0.9);font-size:0.95rem;margin-top:12px;text-align:center}
+      .lightbox-close{position:absolute;top:-18px;right:-18px;background:#111;color:#fff;border-radius:50%;width:44px;height:44px;border:none;font-size:22px;cursor:pointer}
+      .lightbox-nav{position:absolute;top:50%;left:0;right:0;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+      .lightbox-btn{pointer-events:all;background:rgba(0,0,0,0.45);border:none;color:#fff;border-radius:50%;width:52px;height:52px;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+      .lightbox-btn:focus{outline:2px solid rgba(255,255,255,0.12)}
+      @keyframes skyFadeIn { from { opacity: 0; transform: scale(1); } to { opacity: 1; transform: scale(1); } }
+      @keyframes skySlowZoom { from { transform: scale(1); } to { transform: scale(1.025); } }
+      @keyframes slideInLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes slideInRight { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+      .artist-quote {
+        position: absolute; left: 24px; right: 24px; bottom: 28px; color: rgba(255,255,255,0.95);
+        font-size: 1.15rem; font-style: italic; line-height: 1.3; text-shadow: 0 6px 18px rgba(3,12,27,0.6);
+        opacity: 0; transform: translateY(6px); transition: opacity 1s ease 1s, transform 1s ease 1s;
+        backdrop-filter: blur(2px);
+      }
+      .sky-reveal .artist-quote { opacity: 1; transform: translateY(0); }
+
+      /* Slide-in animations for alt-rows */
+      .alt-image-section { opacity: 0; transform: translateX(-60px); }
+      .alt-text-section { opacity: 0; transform: translateX(60px); }
+
+      .alt-row.reverse .alt-image-section { transform: translateX(60px); }
+      .alt-row.reverse .alt-text-section { transform: translateX(-60px); }
+
+      /* Normal rows: image from left, text from right */
+      .alt-image-section.slide-in {
+        animation: slideInLeft 0.8s ease-out forwards;
+      }
+
+      .alt-text-section.slide-in {
+        animation: slideInRight 0.8s ease-out forwards;
+        animation-delay: 0.2s;
+      }
+
+      /* Reverse rows: image from right, text from left */
+      .alt-row.reverse .alt-image-section.slide-in {
+        animation: slideInRight 0.8s ease-out forwards;
+      }
+
+      .alt-row.reverse .alt-text-section.slide-in {
+        animation: slideInLeft 0.8s ease-out forwards;
+        animation-delay: 0.2s;
+      }
+
+      /* Alternating rows */
+      .artist-alt-rows{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+      .alt-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+      .alt-row.reverse{direction:ltr}
+      .alt-row.reverse .alt-image-section{order:2}
+      .alt-row.reverse .alt-text-section{order:1}
+      .alt-image-section{display:flex;flex-direction:column;align-items:center;gap:14px}
+      .alt-image, .sky-image{width:100%;height:380px;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,0.12);background-size:cover;background-position:center}
+      .image-caption{font-size:0.85rem;color:var(--muted);letter-spacing:0.06em}
+      .alt-text-section h2{font-size:2rem;margin-bottom:6px}
+      .alt-text-section .artist-title{margin-bottom:18px}
+      .alt-text-section .artist-bio{margin-bottom:12px}
+
+      @media (max-width:900px){
+        .alt-row{grid-template-columns:1fr;gap:26px}
+        .alt-image,.sky-image{height:320px}
+      }
+
+
+      @media (max-width: 900px) {
+        .artist-profile-page {
+          padding: 80px 30px 40px;
+        }
+        .artist-grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .artist-profile-header h1 {
+          font-size: 2.2rem;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .artist-profile-page {
+          padding: 70px 20px 30px;
+        }
+        .artist-profile-header h1 {
+          font-size: 1.8rem;
+        }
+        .artist-info-section h2 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <button class="hamburger-menu" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-left">
+        <a href="shop-collection.html">GALLERY</a>
+        <a href="blog.html">BLOG</a>
+      </nav>
+      <div class="logo"><img src="logo-header.png" alt="Samantha Logo"></div>
+      <nav class="nav-right">
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+        <button class="icon-btn cart-icon-btn" aria-label="Cart">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"/>
+            <path d="M6.2 9h11.6l0.9 10.4a3 3 0 0 1-3 3.3H8.3a3 3 0 0 1-3-3.3L6.2 9Z"/>
+            <path d="M8.7 12.4a3.3 3.3 0 0 0 6.6 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu -->
+      <nav class="mobile-menu">
+        <a href="shop-collection.html">COLLECTIONS</a>
+        <a href="blog.html">BLOG</a>
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+      </nav>
+    </header>
+
+    <div class="artist-profile-page">
+      <a href="index.html" class="back-button">← Back to Home</a>
+      <div class="artist-profile-header">
+        <h1>About The Artist</h1>
+        <p>Inside The Studio</p>
+      </div>
+
+      <div class="artist-alt-rows">
+        <section class="alt-row">
+          <div class="alt-image-section">
+            <div class="alt-image">
+              <img src="artist.jpg" alt="A painted sky by Samantha" loading="lazy">
+              <div class="image-overlay">Inside the studio — oil on linen</div>
+              <div class="quote-overlay">
+                <div class="quote-content">
+                  <p class="quote-text">"The sky remembers every act of courage… art helps us listen."</p>
+                  <p class="quote-author">— Samantha Ellis</p>
+                </div>
+              </div>
+            </div>
+            <div class="image-caption" hidden>Inside the studio — oil on linen</div>
+          </div>
+
+          <div class="alt-text-section">
+            <h2>Samantha Ellis</h2>
+            <div class="artist-title">Landscape Artist — Northamptonshire</div>
+            <p class="artist-bio">Samantha Ellis is a 28-year-old landscape artist based in the serene countryside of Northamptonshire. Holding a Bachelor of Arts in Painting and Drawing and a Master of Fine Art from the University of Northampton, Samantha has dedicated her life to exploring the language of the skies through oil paints. Her work draws from weather patterns, star charts, and cosmic data, capturing the vastness of the universe while grounding it in moments of profound human experience.</p>
+          </div>
+        </section>
+
+        <section class="alt-row reverse">
+          <div class="alt-image-section">
+            <div class="alt-image">
+              <img src="artistwork.jpg" alt="Studio portrait of Samantha" loading="lazy">
+              <div class="image-overlay">Samantha in her studio — 2024</div>
+            </div>
+            <div class="image-caption" hidden>Samantha in her studio — 2024</div>
+          </div>
+
+          <div class="alt-text-section">
+            <p class="artist-bio">"The sky remembers every act of courage art helps us listen." This belief shapes her approach to painting. For Samantha, the skies are not just a subject — they are a witness. Each brushstroke becomes a conversation between earth and cosmos, history and hope.</p>
+            <p class="artist-bio">At 22, Samantha began to see the world not just for its beauty, but also for its fractures: the injustices, inequalities, and the weight of human-made crises. As a woman, she could no longer remain silent in the face of sexism, racism, homophobia, transphobia, and the systemic injustices surrounding us. As a white woman, she understood the responsibility that privilege carries to speak, to act, and to create work that challenges and inspires change.</p>
+          </div>
+        </section>
+
+        <section class="alt-row">
+          <div class="alt-image-section">
+            <div class="alt-image">
+              <img src="artist3.jpg" alt="A painted horizon by Samantha" loading="lazy">
+              <div class="image-overlay">Archive of skies — selected studies</div>
+            </div>
+            <div class="image-caption" hidden>Archive of skies — selected studies</div>
+          </div>
+
+          <div class="alt-text-section">
+            <p class="artist-bio">During her Master’s degree, Samantha delved into themes of existentialism and displacement, weaving them into her artistic voice. Her paintings began to reflect not only the grandeur of the cosmos but also its quiet, unchanging presence over humanity’s defining moments — both beautiful and heartbreaking.</p>
+            <p class="artist-bio">Climate change further shaped her artistic journey. Confronted daily with the fragility of our planet and humanity’s role in its decline, she began using her art as both a lament and a call to action. Painting became not only a response but a promise to bear witness, to spark dialogue, and to make a difference through beauty and truth.</p>
+            <a href="shop-collection.html" class="learn-more-btn">View Her Works</a>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+      <div class="lightbox-content" role="dialog" aria-modal="true">
+        <button class="lightbox-close" aria-label="Close">×</button>
+        <div class="lightbox-nav">
+          <button class="lightbox-btn lightbox-prev" aria-label="Previous">‹</button>
+          <button class="lightbox-btn lightbox-next" aria-label="Next">›</button>
+        </div>
+        <img src="" alt="" id="lightboxImage">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const lightbox = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightboxImage');
+        const lbCaption = document.getElementById('lightboxCaption');
+        const closeBtn = lightbox.querySelector('.lightbox-close');
+        const prevBtn = lightbox.querySelector('.lightbox-prev');
+        const nextBtn = lightbox.querySelector('.lightbox-next');
+
+        // Build gallery from alt-image-section elements (keeps logical order)
+        const sections = Array.from(document.querySelectorAll('.alt-image-section'));
+        const gallery = sections.map(sec => {
+          const img = sec.querySelector('img');
+          if(!img) return null;
+          const caption = (sec.querySelector('.image-caption') && sec.querySelector('.image-caption').textContent.trim()) || (sec.querySelector('.image-overlay') && sec.querySelector('.image-overlay').textContent.trim()) || img.getAttribute('alt') || '';
+          return { img, src: img.getAttribute('src'), alt: img.getAttribute('alt') || '', caption };
+        }).filter(Boolean);
+
+        let currentIndex = -1;
+
+        function showAt(index){
+          if(index < 0) index = gallery.length - 1;
+          if(index >= gallery.length) index = 0;
+          currentIndex = index;
+          const item = gallery[currentIndex];
+          lbImg.src = item.src;
+          lbImg.alt = item.alt || '';
+          lbCaption.textContent = item.caption || '';
+          lightbox.classList.add('active');
+          lightbox.setAttribute('aria-hidden','false');
+          document.body.style.overflow = 'hidden';
+        }
+
+        function openLightboxAt(index){ showAt(index); }
+        function closeLightbox(){ lightbox.classList.remove('active'); lightbox.setAttribute('aria-hidden','true'); lbImg.src = ''; document.body.style.overflow = ''; currentIndex = -1; }
+        function showNext(){ showAt(currentIndex + 1); }
+        function showPrev(){ showAt(currentIndex - 1); }
+
+        // Attach click handlers to gallery images
+        gallery.forEach((item, idx)=>{
+          item.img.style.cursor = 'zoom-in';
+          item.img.addEventListener('click', ()=> openLightboxAt(idx));
+        });
+
+        prevBtn.addEventListener('click', (e)=>{ e.stopPropagation(); showPrev(); });
+        nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); showNext(); });
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', e=>{ if(e.target===lightbox) closeLightbox(); });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', e=>{
+          if(!lightbox.classList.contains('active')) return;
+          if(e.key === 'Escape') return closeLightbox();
+          if(e.key === 'ArrowRight') return showNext();
+          if(e.key === 'ArrowLeft') return showPrev();
+        });
+
+        // Touch swipe handling for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        lbImg.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+        lbImg.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, {passive:true});
+        function handleSwipe(){
+          const dx = touchEndX - touchStartX;
+          if(Math.abs(dx) < 40) return;
+          if(dx < 0) showNext(); else showPrev();
+        }
+      })();
+
+      // Slide-in animation on scroll for alt-rows
+      document.addEventListener('DOMContentLoaded', () => {
+        const altRows = document.querySelectorAll('.alt-row');
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if(entry.isIntersecting){
+              const imageSection = entry.target.querySelector('.alt-image-section');
+              const textSection = entry.target.querySelector('.alt-text-section');
+
+              if(imageSection && !imageSection.classList.contains('slide-in')){
+                imageSection.classList.add('slide-in');
+              }
+              if(textSection && !textSection.classList.contains('slide-in')){
+                textSection.classList.add('slide-in');
+              }
+            }
+          });
+        }, {
+          threshold: 0.15,
+          rootMargin: '0px 0px -50px 0px'
+        });
+
+        altRows.forEach(row => {
+          observer.observe(row);
+        });
+      });
+    </script>
+  </body>
+</html>

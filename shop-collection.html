@@ -1,0 +1,1214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SAMANTHA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      /* Make header appear scrolled on shop page */
+      .site-header {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      }
+
+      .site-header .logo {
+        color: var(--fg) !important;
+      }
+
+      .site-header .nav-left a,
+      .site-header .nav-right a {
+        color: var(--fg) !important;
+      }
+
+      .site-header .icon-btn {
+        color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-toggle {
+        color: var(--fg) !important;
+        border-bottom-color: transparent !important;
+      }
+
+      .site-header .dropdown-toggle:hover {
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown.active .dropdown-toggle {
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-toggle::after {
+        border-right-color: var(--fg) !important;
+        border-bottom-color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-menu a {
+        color: var(--fg) !important;
+      }
+
+      .site-header .dropdown-menu a::before {
+        background: var(--fg) !important;
+      }
+
+      .shop-page {
+        min-height: 100vh;
+        padding: 100px 80px 80px;
+        background: var(--bg);
+      }
+
+      .products-header {
+        text-align: center;
+        margin-bottom: 80px;
+        margin-top: 15px;
+      }
+
+      .products-header h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-family: 'Georgia', serif;
+        margin: 0;
+      }
+
+      .breadcrumb {
+        font-size: 0.75rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        margin-bottom: 40px;
+        margin-top: 0;
+      }
+
+      .breadcrumb a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        text-decoration: underline;
+      }
+
+      /* Layout: left sidebar for filters, main area for products */
+      .products-controls {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0; /* removed extra gap between filters and separator */
+      }
+
+      /* Filter Bar */
+      .filter-bar {
+        display: flex;
+        gap: 32px;
+        width: 100%;
+        align-items: flex-start;
+      }
+
+      .filter-item {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: relative; /* anchor absolute dropdown */
+      }
+
+      /* Vertical divider after each filter toggle (except last) - attached to the toggle for proper vertical alignment */
+      .filter-item:not(:last-child) .filter-toggle::before {
+        content: "";
+        display: inline-block;
+        width: 1px;
+        height: 18px;
+        background: #efefef;
+        margin-left: 10px;
+        margin-right: 6px;
+        vertical-align: middle;
+        opacity: 0.9;
+      }
+
+      .filter-toggle {
+        background: transparent;
+        border: none;
+        padding: 6px 4px;
+        font-size: 0.9rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .filter-toggle.active { color: var(--fg); }
+
+      /* Filter options are hidden by default in sidebar; toggled open via .open on .filter-item */
+      .filter-options {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background: var(--bg);
+        padding: 10px 12px;
+        border-radius: 4px;
+        box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+        min-width: 180px;
+        z-index: 60;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .filter-item.open .filter-options {
+        display: flex;
+      }
+
+      /* Arrow indicator on the toggle */
+      .filter-toggle::after {
+        content: '\25B6';
+        display: inline-block;
+        margin-left: 6px;
+        transform: rotate(0deg);
+        transition: transform 0.18s ease, opacity 0.18s ease;
+        font-size: 0.85em;
+        color: var(--muted);
+        opacity: 0.5; /* light arrow */
+      }
+
+      .filter-item.open .filter-toggle::after {
+        transform: rotate(90deg);
+        color: var(--fg);
+        opacity: 0.9;
+      }
+
+      .filters-sidebar {
+        flex: 0 0 220px;
+        max-width: 240px;
+      }
+
+      .filters-sidebar .filter-bar {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .controls-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .filters-separator {
+        height: 1px;
+        background: #efefef;
+        margin: 8px 0 48px; /* increased space below the line */
+        width: 100%;
+      }
+
+      .sort-after-line {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 18px;
+      }
+
+      @media (max-width: 900px) {
+        .sort-after-line { justify-content: flex-start; }
+      }
+
+      .controls-after-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .controls-after-line .breadcrumb {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 900px) {
+        .controls-after-line { flex-direction: column; align-items: flex-start; }
+      }
+
+        /* Active filter area shown after clicking a filter toggle */
+        .active-filter-area {
+          display: none;
+          gap: 12px;
+          align-items: center;
+          flex-wrap: wrap;
+          width: 100%;
+        }
+
+        /* When a filter is open, hide breadcrumb & sort and show options area with a bottom line */
+        .controls-after-line.filter-open .breadcrumb,
+        .controls-after-line.filter-open .sort-after-line {
+          display: none;
+        }
+
+        .controls-after-line.filter-open .active-filter-area {
+          display: flex;
+          padding: 8px 0 12px;
+          border-bottom: 1px solid #efefef;
+        }
+
+      .products-main {
+        flex: 1 1 0;
+      }
+
+      .filter-options label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        color: var(--fg);
+        white-space: nowrap;
+      }
+
+      .filter-options input[type="checkbox"]{width:16px;height:16px}
+
+      .products-sort-section {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        margin-left: auto;
+      }
+
+      .products-sort-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .products-sort-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .sort-select {
+        appearance: none;
+        background: transparent;
+        border: 1px solid #ccc;
+        padding: 5px 20px 5px 8px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        color: var(--fg);
+        font-family: inherit;
+        letter-spacing: 0.05em;
+        position: relative;
+      }
+
+      .sort-select:focus {
+        outline: none;
+        border-color: var(--fg);
+      }
+
+      /* Products Grid */
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 48px;
+        row-gap: 80px; /* larger vertical spacing between rows */
+        margin-top: 40px; /* more space above first row */
+        margin-bottom: 100px;
+        justify-items: center;
+      }
+
+      .product-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .product-frame {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        border: 6px solid #1a1a1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f5f5f5;
+        max-width: 240px;
+        width: 100%;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .product-frame:hover {
+        border-color: #000;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(0, 0, 0, 0.25);
+      }
+
+      .product-frame.frame-light {
+        border-color: #d5d5d5;
+        background: #fff;
+      }
+
+      .product-frame.frame-light:hover {
+        border-color: #1a1a1a;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1), 0 20px 40px rgba(0, 0, 0, 0.18);
+      }
+
+      .product-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .product-frame .quick-view {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .product-frame:hover .quick-view {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .product-frame .quick-view button {
+        background: rgba(255, 255, 255, 0.95);
+        color: #0f1419;
+        border: none;
+        padding: 6px 16px;
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .product-frame .quick-view button:hover {
+        background: transparent;
+        color: white;
+        border: 1px solid white;
+      }
+
+      .product-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .product-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        margin: 0;
+        color: var(--fg);
+      }
+
+      .product-price {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        margin: 0;
+        color: var(--fg);
+      }
+
+      .artist-name {
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        margin: 0;
+      }
+
+      .product-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        margin: 0;
+        color: var(--fg);
+      }
+
+      .product-price {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        margin: 0;
+        color: var(--fg);
+      }
+
+      @media (max-width: 1200px) {
+        .products-grid {
+          grid-template-columns: repeat(3, 1fr);
+          column-gap: 28px;
+          row-gap: 56px;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .shop-page {
+          padding: 80px 30px 40px;
+        }
+
+        .products-grid {
+          grid-template-columns: repeat(2, 1fr);
+          column-gap: 20px;
+          row-gap: 48px;
+        }
+
+        .filter-bar {
+          gap: 25px;
+        }
+
+        .products-controls {
+          flex-direction: column;
+          gap: 20px;
+          align-items: flex-start;
+        }
+
+        .products-sort-section {
+          width: 100%;
+          margin-left: 0;
+          justify-content: flex-start;
+        }
+
+        .products-header h1 {
+          font-size: 1.8rem;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .shop-page {
+          padding: 70px 20px 30px;
+        }
+
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .products-header h1 {
+          font-size: 1.5rem;
+        }
+
+        .filter-bar {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .products-controls {
+          flex-direction: column;
+          gap: 12px;
+          align-items: flex-start;
+        }
+
+        /* hide vertical dividers on small screens */
+        .filter-item:not(:last-child) .filter-toggle::before { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <button class="hamburger-menu" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-left">
+        <a href="shop-collection.html">GALLERY</a>
+        <a href="blog.html">BLOG</a>
+      </nav>
+      <div class="logo"><img src="logo-header.png" alt="Samantha Logo"></div>
+      <nav class="nav-right">
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+        <button class="icon-btn cart-icon-btn" aria-label="Cart">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"/>
+            <path d="M6.2 9h11.6l0.9 10.4a3 3 0 0 1-3 3.3H8.3a3 3 0 0 1-3-3.3L6.2 9Z"/>
+            <path d="M8.7 12.4a3.3 3.3 0 0 0 6.6 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <!-- Mobile Menu -->
+      <nav class="mobile-menu">
+        <a href="shop-collection.html">COLLECTIONS</a>
+        <a href="blog.html">BLOG</a>
+        <a href="artist-profile.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+      </nav>
+    </header>
+
+    <div class="shop-page">
+      <div class="products-header">
+        <h1></h1>
+      </div>
+
+      <div class="products-controls">
+        <aside class="filters-sidebar" aria-label="Filters">
+          <div class="filter-bar">
+            <div class="filter-item">
+              <button class="filter-toggle" data-target="artist-options">Artist</button>
+              <div class="filter-options" id="artist-options">
+                <label><input type="checkbox" value="anna"> Anna Landstedt</label>
+                <label><input type="checkbox" value="sam"> Sam Dougherty</label>
+                <label><input type="checkbox" value="dave"> Dave Zammit</label>
+                <label><input type="checkbox" value="elena"> Elena Martinez</label>
+              </div>
+            </div>
+
+            <div class="filter-item">
+              <button class="filter-toggle" data-target="size-options">Size</button>
+              <div class="filter-options" id="size-options">
+                <label><input type="checkbox" value="small"> Small</label>
+                <label><input type="checkbox" value="medium"> Medium</label>
+                <label><input type="checkbox" value="large"> Large</label>
+                <label><input type="checkbox" value="xlarge"> XL</label>
+              </div>
+            </div>
+
+            <div class="filter-item">
+              <button class="filter-toggle" data-target="frame-options">Frame</button>
+              <div class="filter-options" id="frame-options">
+                <label><input type="checkbox" value="black"> Black</label>
+                <label><input type="checkbox" value="no-frame"> No Frame</label>
+                <label><input type="checkbox" value="white"> White</label>
+                <label><input type="checkbox" value="wood"> Wood</label>
+              </div>
+            </div>
+
+            <div class="filter-item">
+              <button class="filter-toggle" data-target="price-options">Price</button>
+              <div class="filter-options" id="price-options">
+                <label><input type="checkbox" value="under-100"> Under $100</label>
+                <label><input type="checkbox" value="100-250"> $100 - $250</label>
+                <label><input type="checkbox" value="250-500"> $250 - $500</label>
+                <label><input type="checkbox" value="over-500"> Over $500</label>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- sort control moved below the separator line -->
+      </div>
+
+      <div class="filters-separator" aria-hidden="true"></div>
+
+      <div class="controls-after-line">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a> / <a href="index.html#collections">Collections</a> / <span>All</span>
+        </div>
+
+        <div class="sort-after-line">
+          <div class="products-sort-section">
+            <div class="products-sort-container">
+              <span class="products-sort-label">Sort by:</span>
+              <select class="sort-select">
+                <option value="alphabetical">ALPHABETICALLY, A-Z</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="active-filter-area" aria-hidden="true"></div>
+      </div>
+
+      <script>
+        // Toggle each filter group's visibility by toggling .open on its .filter-item
+        document.addEventListener('DOMContentLoaded', function(){
+          const toggles = document.querySelectorAll('.filter-toggle');
+          toggles.forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+              const item = btn.closest('.filter-item');
+              if(!item) return;
+              const id = btn.getAttribute('data-target');
+              const optionsEl = document.getElementById(id);
+
+              // controls row and active area
+              const controls = document.querySelector('.controls-after-line');
+              const activeArea = document.querySelector('.active-filter-area');
+
+              // close other open filters and move their options back if needed
+              document.querySelectorAll('.filter-item.open').forEach(o=>{
+                if(o !== item) {
+                  o.classList.remove('open');
+                  const otherId = o.querySelector('.filter-toggle')?.getAttribute('data-target');
+                  const otherOptions = otherId ? document.getElementById(otherId) : null;
+                  if(otherOptions && activeArea.contains(otherOptions)){
+                    o.appendChild(otherOptions);
+                    otherOptions.style.position = '';
+                    otherOptions.style.display = '';
+                    otherOptions.style.flexDirection = '';
+                    otherOptions.style.alignItems = '';
+                    otherOptions.style.gap = '';
+                  }
+                }
+              });
+
+              // toggle this item
+              const isOpen = item.classList.toggle('open');
+
+              if(isOpen && optionsEl){
+                // move the actual options element into the active area so inputs remain interactive
+                if(!activeArea.contains(optionsEl)){
+                  activeArea.innerHTML = '';
+                  activeArea.appendChild(optionsEl);
+                  // make it horizontal and visible
+                  optionsEl.style.position = 'static';
+                  optionsEl.style.display = 'flex';
+                  optionsEl.style.flexDirection = 'row';
+                  optionsEl.style.alignItems = 'center';
+                  optionsEl.style.gap = '12px';
+                }
+
+                controls.classList.add('filter-open');
+                activeArea.setAttribute('aria-hidden','false');
+              } else {
+                // move the options back into the filter item and restore styles
+                if(optionsEl && activeArea.contains(optionsEl)){
+                  item.appendChild(optionsEl);
+                  optionsEl.style.position = '';
+                  optionsEl.style.display = '';
+                  optionsEl.style.flexDirection = '';
+                  optionsEl.style.alignItems = '';
+                  optionsEl.style.gap = '';
+                }
+                controls.classList.remove('filter-open');
+                activeArea.innerHTML = '';
+                activeArea.setAttribute('aria-hidden','true');
+                item.classList.remove('open');
+              }
+            });
+          });
+        });
+      </script>
+
+      <div class="products-grid">
+        <!-- Product 1 -->
+        <div class="product-card" data-product-id="ivefoundit" data-artist="Sam Dougherty" data-size="small" data-frame="black" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="ihavefoundit.webp" alt="Rodeo">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">I’ve Found It (2022)</p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card" data-product-id="bliss" data-artist="Sam Dougherty" data-size="medium" data-frame="white" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="bliss.png" alt="Teeber Rodeo">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Bliss (2019)</p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="product-card" data-product-id="kourtney" data-artist="Sam Dougherty" data-size="large" data-frame="black" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="kourtney.png" alt="Top of Innsbruck">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Kourtney (2019)</p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="product-card" data-product-id="fordad" data-artist="Sam Dougherty" data-size="large" data-frame="black" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="fordad.webp" alt="Painting">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">For Dad (2021) </p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 5 -->
+        <div class="product-card" data-product-id="ivefoundit-i" data-artist="James Chen" data-size="xlarge" data-frame="white" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="i’ve found it i.webp" alt="Mountain Whispers">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">I’ve Found It I (2022) </p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="product-card" data-product-id="european-championship" data-artist="Maya Patel" data-size="medium" data-frame="black" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="european women’s championship.webp" alt="Urban Pulse">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">European Women’s Championship (July 31st 2022)</p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 7 -->
+        <div class="product-card" data-product-id="illlookup" data-artist="Elena Martinez" data-size="large" data-frame="black" data-price="769">
+          <div class="product-frame frame-dark">
+            <img src="i’ll look up forever.webp" alt="Ethereal Light">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">I’ll Look Up Forever </p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 8 -->
+        <div class="product-card" data-product-id="wecanhope" data-artist="Sam Dougherty" data-size="medium" data-frame="white" data-price="260">
+          <div class="product-frame frame-dark">
+            <img src="we can only hope.png" alt="Ocean Serenity">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">We Can Only Hope</p>
+            <p class="product-price">From $260.00</p>
+          </div>
+        </div>
+
+        <!-- Product 9 -->
+       
+
+        <!-- Product 10 -->
+        <div class="product-card" data-product-id="kourtney-vertical" data-artist="Lisa Wong" data-size="medium" data-frame="black" data-price="275">
+          <div class="product-frame frame-rectangle-v">
+            <img src="kourtney.png" alt="Vertical Frame">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Kourtney (2019) </p>
+            <p class="product-price">£769</p>
+          </div>
+        </div>
+
+        <!-- Product 11 -->
+        <div class="product-card" data-product-id="beyond-words" data-artist="David Brown" data-size="large" data-frame="black" data-price="300">
+          <div class="product-frame frame-dark">
+            <img src="beyond words (2019).webp" alt="Abstract Dreams">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name">David Brown</p>
+            <p class="product-title">Beyond Words (2019)</p>
+            <p class="product-price">From $300.00</p>
+          </div>
+        </div>
+
+        
+
+        <!-- Product 13 -->
+        <div class="product-card" data-product-id="untitled-ii" data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
+          <div class="product-frame frame-rectangle-v">
+            <img src="untitled ii (2019).webp" alt="Moonlight">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Untitled II (2019)</p>
+            <p class="product-price">From $220.00</p>
+          </div>
+        </div>
+
+        <!-- Product 14 -->
+        <div class="product-card" data-product-id="candyfloss-clouds" data-artist="Christine Lee" data-size="xlarge" data-frame="black" data-price="380">
+          <div class="product-frame frame-dark">
+            <img src="candy floss clouds (2019).webp" alt="Serenity">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Candy Floss Clouds (2019)</p>
+            <p class="product-price">From $380.00</p>
+          </div>
+        </div>
+
+        
+       
+
+        <!-- Product 17 -->
+        <div class="product-card" data-product-id="findmethemoon" data-artist="Pierre Dubois" data-size="large" data-frame="black" data-price="330">
+          <div class="product-frame frame-dark">
+            <img src="find me the moon (2022).webp" alt="Lavender Fields">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Find Me the Moon (2022)</p>
+            <p class="product-price">From $330.00</p>
+          </div>
+        </div>
+
+
+        
+
+        <!-- Product 20 -->
+        <div class="product-card" data-product-id="findmethemoon-i" data-artist="Emma Watson" data-size="large" data-frame="black" data-price="340">
+          <div class="product-frame frame-dark">
+            <img src="find me the moon i (2022).webp" alt="Autumn Leaves">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Find Me the Moon I (2022)</p>
+            <p class="product-price">From $340.00</p>
+          </div>
+        </div>
+
+        
+
+       
+
+        <!-- Product 23 -->
+        <div class="product-card" data-product-id="wellingborough" data-artist="James Mitchell" data-size="large" data-frame="black" data-price="320">
+          <div class="product-frame frame-dark">
+            <img src="wellingborough (2020).webp" alt="Forest Path">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Wellingborough (2020)</p>
+            <p class="product-price">From $320.00</p>
+          </div>
+        </div>
+
+
+        
+
+        <!-- Product 26 -->
+        <div class="product-card" data-product-id="hurricane-maria" data-artist="Maria Santos" data-size="xlarge" data-frame="black" data-price="400">
+          <div class="product-frame frame-dark">
+            <img src="hurricane maria (2020).png" alt="Ocean Waves">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name">Maria Santos</p>
+            <p class="product-title">Hurricane Maria (2020)</p>
+            <p class="product-price">From $400.00</p>
+          </div>
+        </div>
+
+       
+
+        
+
+        <!-- Product 29 -->
+        <div class="product-card" data-product-id="hurricane-katrina" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="hurricane katrina (2020).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Hurricane Katrina (2020) </p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+        
+
+        
+        <div class="product-card" data-product-id="storm-andre" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+            <div class="product-frame frame-dark">
+            <img src="storm andré (2020).png" alt="Midnight Stars">
+          <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Storm André (2020)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+        
+        <div class="product-card" data-product-id="mount-lamington" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+            <div class="product-frame frame-dark">
+            <img src="mount lamington (2020).png" alt="Midnight Stars">
+          <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Mount Lamington (2020)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+        <div class="product-card" data-product-id="mount-sinabung" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+           <div class="product-frame frame-dark">
+            <img src="mount sinabung (2018).png" alt="Midnight Stars">
+          <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Mount Sinabung (2018)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+
+        <div class="product-card" data-product-id="mount-st-helens" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+            <div class="product-frame frame-dark">
+            <img src="mount st. helens (2020).webp" alt="Midnight Stars">
+          <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Mount St. Helens (2020)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+        
+        
+         <div class="product-card" data-product-id="great-smog-1952" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+            <div class="product-frame frame-dark">
+            <img src="the great smog of 1952 (2020).webp" alt="Midnight Stars">
+          <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">The Great Smog of 1952 (2020)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+
+
+         <div class="product-card" data-product-id="australian-fires-2020" data-artist="Samantha Ellis" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="australian fires (2020).webp" alt="Midnight Stars">
+          
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Australian Fires (2020)</p>
+            <p class="product-price">From $769.00</p>
+          </div>
+        </div>
+
+
+         <div class="product-card" data-product-id="icant-lift-my-head-2021" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+      
+        <div class="product-frame frame-dark">
+            <img src="i can’t lift my head (2021).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">  
+            <p class="artist-name"></p>
+            <p class="product-title">I Can’t Lift My Head (2021)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+         
+        <div class="product-card" data-product-id="contrasting-waves-2017" data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
+          <div class="product-frame frame-rectangle-v">
+            <img src="contrasting waves (2017).webp" alt="Moonlight">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Contrasting Waves (2017)</p>
+            <p class="product-price">From $220.00</p>
+          </div>
+        </div>
+        
+
+         <div class="product-card" data-product-id="untitled2019" data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
+          <div class="product-frame frame-rectangle-v">
+            <img src="untiltled.png" alt="Moonlight">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Untitled (2019)</p>
+            <p class="product-price">From $220.00</p>
+          </div>
+        </div>
+
+
+         <div class="product-card" data-product-id="untitled-I-2019"data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
+          <div class="product-frame frame-rectangle-v">
+            <img src="untitled i.png" alt="Moonlight">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Untitled I (2019)</p>
+            <p class="product-price">From $220.00</p>
+          </div>
+        </div>
+
+
+         <div class="product-card" data-product-id="Charles Darwin" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="charles darwin (24th november 1859) (2022).jpg" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Charles Darwin (24th November 1859) (2022)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+
+
+
+         <div class="product-card" data-product-id="Emily Davision" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="emily davison (4th june 1913) (2022).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Emily Davison (4th June 1913) (2022)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+         <div class="product-card" data-product-id="Emmett Till" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="emmett till (21st august 1955) (2022).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Emmett Till (21st August 1955) (2022)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+         <div class="product-card" data-product-id="" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="yuri gagarin (12th april 1961) (2022).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Yuri Gagarin (12th April 1961) (2022)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+<div class="product-card" data-product-id="Stonewall Riots" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="stonewall riots (27th june 1969) (2022).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Stonewall Riots (27th June 1969) (2022)</p>
+            <p class="product-price">From $959.00</p>
+          </div>
+        </div>
+
+        <div class="product-card" data-product-id="Sarah Everard" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
+          <div class="product-frame frame-dark">
+            <img src="sarah everard (12th march 2021) (2022).webp" alt="Midnight Stars">
+            <div class="quick-view"><button>QUICK VIEW</button></div>
+          </div>
+          <div class="product-info">
+            <p class="artist-name"></p>
+            <p class="product-title">Sarah Everard (12th March 2021) (2022)</p>
+            <p class="product-price">From $360.00</p>
+          </div>
+        </div>
+
+        
+        
+
+
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      // Apply filters based on checked boxes in the filter options
+      function applyFilters(){
+        const selected = {
+          artist: Array.from(document.querySelectorAll('#artist-options input[type="checkbox"]:checked')).map(i=>i.value),
+          size: Array.from(document.querySelectorAll('#size-options input[type="checkbox"]:checked')).map(i=>i.value),
+          frame: Array.from(document.querySelectorAll('#frame-options input[type="checkbox"]:checked')).map(i=>i.value),
+          price: Array.from(document.querySelectorAll('#price-options input[type="checkbox"]:checked')).map(i=>i.value)
+        };
+
+        const cards = document.querySelectorAll('.product-card');
+        cards.forEach(card=>{
+          const artist = card.dataset.artist || '';
+          const size = card.dataset.size || '';
+          const frame = card.dataset.frame || '';
+          const price = Number(card.dataset.price || 0);
+          let visible = true;
+
+          if(selected.artist.length && !selected.artist.includes(artist)) visible = false;
+          if(selected.size.length && !selected.size.includes(size)) visible = false;
+          if(selected.frame.length && !selected.frame.includes(frame)) visible = false;
+
+          if(selected.price.length){
+            const match = selected.price.some(range=>{
+              if(range==='under-100') return price < 100;
+              if(range==='100-250') return price >= 100 && price <= 250;
+              if(range==='250-500') return price > 250 && price <= 500;
+              if(range==='over-500') return price > 500;
+              return false;
+            });
+            if(!match) visible = false;
+          }
+
+          card.style.display = visible ? '' : 'none';
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function(){
+        // Attach change listeners to checkboxes (both in original sidebar and moved active area — it's the same element)
+        document.querySelectorAll('.filter-options input[type="checkbox"]').forEach(cb=>{
+          cb.addEventListener('change', applyFilters);
+        });
+
+        // Quick view button functionality
+        const quickViewButtons = document.querySelectorAll('.product-frame .quick-view button');
+        quickViewButtons.forEach(button => {
+          button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const productCard = button.closest('.product-card');
+            const title = productCard.querySelector('.product-title').textContent;
+            console.log('Quick view clicked for:', title);
+          });
+        });
+
+        applyFilters();
+      });
+    </script>
+  </body>
+</html>
