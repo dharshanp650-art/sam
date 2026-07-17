@@ -7,12 +7,13 @@ from email.message import EmailMessage
 # create flask app, serve static files from current directory
 app = Flask(__name__, static_folder='.', static_url_path='')
 
-# configuration from environment variables
+# configuration from environment variables (set these in your hosting
+# provider's dashboard - never hardcode credentials here)
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.hostinger.com')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
-SMTP_USER = os.environ.get('SMTP_USER', 'info@trainaxr.com')
-SMTP_PASS = os.environ.get('SMTP_PASS', '***REMOVED***')
-TO_ADDRESS = os.environ.get('TO_ADDRESS', 'info@trainaxr.com')
+SMTP_USER = os.environ.get('SMTP_USER')
+SMTP_PASS = os.environ.get('SMTP_PASS')
+TO_ADDRESS = os.environ.get('TO_ADDRESS', SMTP_USER)
 
 @app.route('/')
 def index():
@@ -166,5 +167,5 @@ def submit_contact():
     return 'OK', 200
 
 if __name__ == '__main__':
-    # debug mode for development
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
