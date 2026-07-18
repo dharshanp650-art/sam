@@ -1810,14 +1810,14 @@ async function initiateGooglePay(){
   console.warn('initiateGooglePay called but payment gateways have been removed');
 }
 
-// Hero / Quote / Artistcloud combined section - scroll-scrubbed crossfade
+// Hero / Quote / Artistcloud combined section - scroll-linked hard cuts
 // The section is pinned (position: sticky) for its scroll range. The first
-// CROSSFADE_FRACTION of that range plays the video/quote/artistcloud
-// crossfade (video and quote each get a generous hold; artistcloud only
-// gets enough room to fade in). The remaining range is a hold: the
-// artistcloud frame stays frozen in place while "Inside The Studio" (a
-// normal, later, opaque section) scrolls up over it and covers it — the
-// same pinned-stack effect used by sites like Stripe/Apple/LTX.
+// CUT_FRACTION of that range switches instantly between video -> quote ->
+// artistcloud (no crossfade, just a hard cut at each threshold). The
+// remaining range is a hold: the artistcloud frame stays frozen in place
+// while "Inside The Studio" (a normal, later, opaque section) scrolls up
+// over it and covers it — the same pinned-stack effect used by sites like
+// Stripe/Apple/LTX.
 function initializeArtistcloudAnimation(){
   const section = document.getElementById('heroFadeSection');
   const videoLayer = document.getElementById('videoLayer');
@@ -1828,18 +1828,10 @@ function initializeArtistcloudAnimation(){
 
   if(!section || !videoLayer || !quoteLayer || !cloudLayer) return;
 
-  // Each transition is split into two back-to-back halves — the outgoing
-  // layer fades fully to 0, then the incoming layer fades in from 0 — so
-  // they're never simultaneously visible (no crossfade ghosting).
-  // Video and quote are a brief intro; artistcloud gets the long "chapter"
-  // (fades in slowly, then holds through the entire cover phase) so it reads
-  // as its own long pinned scroll moment, Apple-storytelling style.
-  const videoFadeOutStart = 0.22;
-  const videoFadeOutEnd = 0.26;
-  const quoteFadeInEnd = 0.30;
-  const quoteFadeOutStart = 0.46;
-  const quoteFadeOutEnd = 0.52;
-  const cloudFadeInEnd = 1.0; // end of the crossfade portion (not the whole section)
+  // Hard-cut thresholds within the cut phase (0-1): video shows first,
+  // switches straight to quote, then straight to artistcloud — no fading.
+  const videoCutAt = 0.33;
+  const quoteCutAt = 0.66;
 
   function update(){
     const scrollableHeight = section.offsetHeight - window.innerHeight;
@@ -1852,41 +1844,23 @@ function initializeArtistcloudAnimation(){
     // (pulled up by margin-top:-100vh in CSS) to slide from just-below-the-
     // viewport to fully covering it. Derive the fraction dynamically so it
     // stays exact regardless of breakpoint/section height.
-    const CROSSFADE_FRACTION = scrollableHeight > 0
+    const CUT_FRACTION = scrollableHeight > 0
       ? Math.max(0, 1 - window.innerHeight / scrollableHeight)
       : 1;
 
-    // Remap the crossfade portion of the range to 0-1; once past it, stay
+    // Remap the cut portion of the range to 0-1; once past it, stay
     // clamped at 1 (artistcloud fully visible) for the hold-and-cover phase.
-    const progress = Math.min(1, rawProgress / CROSSFADE_FRACTION);
+    const progress = Math.min(1, rawProgress / CUT_FRACTION);
 
     let videoOpacity, quoteOpacity, cloudOpacity;
 
-    if(progress <= videoFadeOutStart){
+    if(progress <= videoCutAt){
       videoOpacity = 1; quoteOpacity = 0; cloudOpacity = 0;
-    } else if(progress <= videoFadeOutEnd){
-      videoOpacity = 1 - (progress - videoFadeOutStart) / (videoFadeOutEnd - videoFadeOutStart);
-      quoteOpacity = 0; cloudOpacity = 0;
-    } else if(progress <= quoteFadeInEnd){
-      videoOpacity = 0;
-      quoteOpacity = (progress - videoFadeOutEnd) / (quoteFadeInEnd - videoFadeOutEnd);
-      cloudOpacity = 0;
-    } else if(progress <= quoteFadeOutStart){
+    } else if(progress <= quoteCutAt){
       videoOpacity = 0; quoteOpacity = 1; cloudOpacity = 0;
-    } else if(progress <= quoteFadeOutEnd){
-      videoOpacity = 0;
-      quoteOpacity = 1 - (progress - quoteFadeOutStart) / (quoteFadeOutEnd - quoteFadeOutStart);
-      cloudOpacity = 0;
-    } else if(progress <= cloudFadeInEnd){
-      videoOpacity = 0; quoteOpacity = 0;
-      cloudOpacity = (progress - quoteFadeOutEnd) / (cloudFadeInEnd - quoteFadeOutEnd);
     } else {
       videoOpacity = 0; quoteOpacity = 0; cloudOpacity = 1;
     }
-
-    videoOpacity = Math.max(0, Math.min(1, videoOpacity));
-    quoteOpacity = Math.max(0, Math.min(1, quoteOpacity));
-    cloudOpacity = Math.max(0, Math.min(1, cloudOpacity));
 
     videoLayer.style.opacity = videoOpacity;
     videoLayer.style.pointerEvents = videoOpacity > 0.5 ? 'auto' : 'none';

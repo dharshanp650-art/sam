@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>SAMANTHA — Original Art & Fine Prints</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>*{
     margin: 0px;
@@ -21,17 +24,8 @@
     position: absolute;
     inset: 0;
 }
-.container-1 .cloud-bg-video{
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-    background: #000;
-}
 .container-1 .cloud-bg-image{
-    display: none;
+    display: block;
     position: absolute;
     inset: 0;
     width: 100%;
@@ -39,14 +33,6 @@
     object-fit: contain;
     object-position: center;
     background: #000;
-}
-@media (max-width:640px){
-    .container-1 .cloud-bg-video{
-        display: none;
-    }
-    .container-1 .cloud-bg-image{
-        display: block;
-    }
 }
 .container-1 .cloud-heading{
     position: absolute;
@@ -195,7 +181,7 @@
           </video>
           <div class="hero-overlay">
             <div class="hero-content">
-              <h1 class="hero-heading">Original Oil Painting by Samantha Ellis</h1>
+              <h1 class="hero-heading">Original Oil Painting<br>by Samantha Ellis</h1>
               <p class="hero-paragraph">The sky remembers every act of courage. Art helps us listen.</p>
             </div>
           </div>
@@ -211,7 +197,6 @@
         <div class="fade-layer cloud-layer" id="cloudLayer">
           <div class="container-1">
             <div class="cloud-bg" id="cloudBg">
-              <video class="cloud-bg-video" src="artistcloudvideo.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
               <img class="cloud-bg-image" src="artistcloud2.jpeg" alt="" aria-hidden="true">
             </div>
           </div>
