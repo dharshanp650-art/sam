@@ -81,20 +81,22 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--b
 /* Hero / Quote / Artistcloud combined fade section.
    Height = crossfade distance (video/quote/artistcloud, see script.js
    CROSSFADE_FRACTION) + extra hold distance during which the artistcloud
-   frame stays pinned while "Inside The Studio" slides up to cover it. */
-.hero-fade-section{position:relative;height:250vh}
+   frame stays pinned while "Inside The Studio" slides up to cover it.
+   Taller section = more scroll distance per phase = a slower, smoother
+   crossfade instead of a rushed one. */
+.hero-fade-section{position:relative;height:400vh}
 @media (max-width:640px){
-  .hero-fade-section{height:220vh}
+  .hero-fade-section{height:320vh}
 }
 .hero.hero-sticky{position:sticky;top:0}
 
-.fade-layer{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity 1.1s ease}
+/* Opacity is driven continuously from scroll position in script.js (a true
+   scroll-scrubbed crossfade), so no CSS transition here — a transition would
+   fight the constantly-updating JS value and stutter on fast scrolls. */
+.fade-layer{position:absolute;inset:0;opacity:0;pointer-events:none}
 .fade-layer.video-layer{opacity:1;pointer-events:auto;z-index:1}
 .fade-layer.quote-overlay{z-index:2}
 .fade-layer.cloud-layer{z-index:3}
-@media (prefers-reduced-motion: reduce){
-  .fade-layer{transition:none}
-}
 
 /* Hero Section */
 .hero{position:relative;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}

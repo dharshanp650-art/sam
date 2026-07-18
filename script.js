@@ -1810,14 +1810,15 @@ async function initiateGooglePay(){
   console.warn('initiateGooglePay called but payment gateways have been removed');
 }
 
-// Hero / Quote / Artistcloud combined section - scroll-linked hard cuts
+// Hero / Quote / Artistcloud combined section - scroll-scrubbed crossfades
 // The section is pinned (position: sticky) for its scroll range. The first
-// CUT_FRACTION of that range switches instantly between video -> quote ->
-// artistcloud (no crossfade, just a hard cut at each threshold). The
-// remaining range is a hold: the artistcloud frame stays frozen in place
-// while "Inside The Studio" (a normal, later, opaque section) scrolls up
-// over it and covers it — the same pinned-stack effect used by sites like
-// Stripe/Apple/LTX.
+// CROSSFADE_FRACTION of that range smoothly crossfades video -> quote ->
+// artistcloud, with opacity computed directly from scroll position every
+// frame (not a hard cut eased by a CSS transition, which would stutter and
+// restart mid-fade on fast/continuous scrolling). The remaining range is a
+// hold: the artistcloud frame stays frozen in place while "Inside The
+// Studio" (a normal, later, opaque section) scrolls up over it and covers
+// it — the same pinned-stack effect used by sites like Stripe/Apple/LTX.
 function initializeArtistcloudAnimation(){
   const section = document.getElementById('heroFadeSection');
   const videoLayer = document.getElementById('videoLayer');
@@ -1828,10 +1829,16 @@ function initializeArtistcloudAnimation(){
 
   if(!section || !videoLayer || !quoteLayer || !cloudLayer) return;
 
-  // Hard-cut thresholds within the cut phase (0-1): video shows first,
-  // switches straight to quote, then straight to artistcloud — no fading.
-  const videoCutAt = 0.33;
-  const quoteCutAt = 0.66;
+  // Centers of the crossfade, and how wide (in progress units, 0-1) each
+  // crossfade overlap is. A wider fadeWidth = a longer, gentler blend.
+  const videoCutAt = 1 / 3;
+  const quoteCutAt = 2 / 3;
+  const fadeWidth = 0.22;
+
+  function smoothstep(edge0, edge1, x){
+    const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+  }
 
   function update(){
     const scrollableHeight = section.offsetHeight - window.innerHeight;
@@ -1844,23 +1851,20 @@ function initializeArtistcloudAnimation(){
     // (pulled up by margin-top:-100vh in CSS) to slide from just-below-the-
     // viewport to fully covering it. Derive the fraction dynamically so it
     // stays exact regardless of breakpoint/section height.
-    const CUT_FRACTION = scrollableHeight > 0
+    const CROSSFADE_FRACTION = scrollableHeight > 0
       ? Math.max(0, 1 - window.innerHeight / scrollableHeight)
       : 1;
 
-    // Remap the cut portion of the range to 0-1; once past it, stay
+    // Remap the crossfade portion of the range to 0-1; once past it, stay
     // clamped at 1 (artistcloud fully visible) for the hold-and-cover phase.
-    const progress = Math.min(1, rawProgress / CUT_FRACTION);
+    const progress = Math.min(1, rawProgress / CROSSFADE_FRACTION);
 
-    let videoOpacity, quoteOpacity, cloudOpacity;
+    const videoFadeOut = smoothstep(videoCutAt - fadeWidth / 2, videoCutAt + fadeWidth / 2, progress);
+    const quoteFadeOut = smoothstep(quoteCutAt - fadeWidth / 2, quoteCutAt + fadeWidth / 2, progress);
 
-    if(progress <= videoCutAt){
-      videoOpacity = 1; quoteOpacity = 0; cloudOpacity = 0;
-    } else if(progress <= quoteCutAt){
-      videoOpacity = 0; quoteOpacity = 1; cloudOpacity = 0;
-    } else {
-      videoOpacity = 0; quoteOpacity = 0; cloudOpacity = 1;
-    }
+    const videoOpacity = 1 - videoFadeOut;
+    const quoteOpacity = videoFadeOut * (1 - quoteFadeOut);
+    const cloudOpacity = quoteFadeOut;
 
     videoLayer.style.opacity = videoOpacity;
     videoLayer.style.pointerEvents = videoOpacity > 0.5 ? 'auto' : 'none';
