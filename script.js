@@ -930,11 +930,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       addToCartBtn.addEventListener('click',()=>{
         if(SOLD_PRODUCT_IDS.includes(productId)) return;
         addToCart(buildCartItem());
-        alert('Added to cart!');
       });
     }
 
-    // Buy Now - add to cart and go straight to checkout, skipping the "added" alert
+    // Buy Now - add to cart and go straight to checkout
     if(buyNowBtn){
       buyNowBtn.addEventListener('click',()=>{
         if(SOLD_PRODUCT_IDS.includes(productId)) return;
@@ -1616,10 +1615,37 @@ function updateCartDisplay(){
   }
 }
 
+let cartToastTimer=null;
 function showCartNotification(){
-  // Optional: Show a brief notification that item was added
   const cartItem=cart[cart.length-1];
-  console.log(`Added ${cartItem.qty}x ${cartItem.title} to cart`);
+  if(!cartItem) return;
+
+  let toast=document.getElementById('cartToast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='cartToast';
+    toast.className='cart-toast';
+    toast.setAttribute('role','status');
+    toast.setAttribute('aria-live','polite');
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML=`
+    <img class="cart-toast-image" src="${cartItem.image||''}" alt="">
+    <div class="cart-toast-text">
+      <div class="cart-toast-title">Added to cart</div>
+      <div class="cart-toast-item">${cartItem.title||''}</div>
+    </div>
+  `;
+
+  toast.classList.remove('show');
+  void toast.offsetWidth; // restart transition
+  toast.classList.add('show');
+
+  clearTimeout(cartToastTimer);
+  cartToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+  },2600);
 }
 
 // Cart Button Event Listeners
