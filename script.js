@@ -959,8 +959,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 function drawRealisticCloud(cloud){}
 
-// Quick View Modal Functionality
+// Quick View Modal Functionality (homepage carousels + shop grid quick-view popups).
+// Must not run on product-detail.html: it looks up #addToCartBtn globally, which on
+// that page is the real Add to Cart button - binding this handler there added a
+// second, stale click listener that always added "Rodeo" (currentProductKey's unused
+// default) alongside whatever painting was actually being purchased.
 document.addEventListener('DOMContentLoaded',()=>{
+  if(document.querySelector('.product-detail-page')) return;
   const isShopPage = !!document.querySelector('.shop-page');
   const modal = isShopPage ? null : document.getElementById('quickViewModal');
   const closeBtn = isShopPage ? null : document.getElementById('closeModal');
