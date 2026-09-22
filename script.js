@@ -843,9 +843,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     const statusEl = document.getElementById('productStatus');
     const addToCartBtn = document.getElementById('addToCartBtn');
+    const buyNowBtn = document.getElementById('buyNowBtn');
 
-    // Reflects SOLD_PRODUCT_IDS onto the status badge and Add to Cart button. Called
-    // once on load and again once the live sold list has finished loading from the server.
+    // Reflects SOLD_PRODUCT_IDS onto the status badge, Add to Cart, and Buy Now
+    // buttons. Called once on load and again once the live sold list has loaded.
     function refreshSoldState(){
       const sold = !!product && SOLD_PRODUCT_IDS.includes(productId);
       if(statusEl){
@@ -856,6 +857,28 @@ document.addEventListener('DOMContentLoaded',()=>{
         addToCartBtn.disabled = sold;
         addToCartBtn.textContent = sold ? 'Sold Out' : 'Add to Cart';
       }
+      if(buyNowBtn){
+        buyNowBtn.disabled = sold;
+      }
+    }
+
+    function buildCartItem(){
+      const qtyInput = document.getElementById('qtyInput');
+      const qty = parseInt(qtyInput?.value || 1);
+      const size = document.getElementById('sizeSelect')?.value || '100 × 100 cm';
+      const frame = document.getElementById('frameSelect')?.value || 'Black';
+
+      return {
+        id: productId,
+        productKey: productId,
+        title: product.title,
+        artist: product.artist,
+        price: product.price,
+        image: product.image,
+        qty: qty,
+        size: size,
+        frame: frame
+      };
     }
 
     if(product){
@@ -906,24 +929,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(addToCartBtn){
       addToCartBtn.addEventListener('click',()=>{
         if(SOLD_PRODUCT_IDS.includes(productId)) return;
-        const qty = parseInt(qtyInput?.value || 1);
-        const size = document.getElementById('sizeSelect')?.value || '100 × 100 cm';
-        const frame = document.getElementById('frameSelect')?.value || 'Black';
-        
-        const cartItem = {
-          id: productId,
-          productKey: productId,
-          title: product.title,
-          artist: product.artist,
-          price: product.price,
-          image: product.image,
-          qty: qty,
-          size: size,
-          frame: frame
-        };
-        
-        addToCart(cartItem);
+        addToCart(buildCartItem());
         alert('Added to cart!');
+      });
+    }
+
+    // Buy Now - add to cart and go straight to checkout, skipping the "added" alert
+    if(buyNowBtn){
+      buyNowBtn.addEventListener('click',()=>{
+        if(SOLD_PRODUCT_IDS.includes(productId)) return;
+        addToCart(buildCartItem());
+        window.location.href = 'checkout.html';
       });
     }
     

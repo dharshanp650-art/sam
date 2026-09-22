@@ -270,10 +270,15 @@
         font-size: 0.95rem;
       }
       
-      .add-to-cart-btn {
-        background: var(--fg);
-        color: var(--bg);
-        padding: 14px 48px;
+      .product-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      .add-to-cart-btn,
+      .buy-now-btn {
+        flex: 1;
+        padding: 14px 24px;
         border: 2px solid var(--fg);
         font-size: 0.9rem;
         letter-spacing: 0.12em;
@@ -282,24 +287,46 @@
         cursor: pointer;
         transition: all 0.4s ease;
         border-radius: 2px;
-        width: 100%;
       }
-      
+
+      .add-to-cart-btn {
+        background: var(--fg);
+        color: var(--bg);
+      }
+
       .add-to-cart-btn:hover {
         background: transparent;
         color: var(--fg);
       }
 
-      .add-to-cart-btn:disabled {
+      .buy-now-btn {
+        background: transparent;
+        color: var(--fg);
+      }
+
+      .buy-now-btn:hover {
+        background: var(--fg);
+        color: var(--bg);
+      }
+
+      .add-to-cart-btn:disabled,
+      .buy-now-btn:disabled {
         background: #e5e5e5;
         border-color: #e5e5e5;
         color: #8a8a8a;
         cursor: not-allowed;
       }
 
-      .add-to-cart-btn:disabled:hover {
+      .add-to-cart-btn:disabled:hover,
+      .buy-now-btn:disabled:hover {
         background: #e5e5e5;
         color: #8a8a8a;
+      }
+
+      @media (max-width: 480px) {
+        .product-actions {
+          flex-direction: column;
+        }
       }
       
       @media (max-width: 1200px) {
@@ -394,7 +421,10 @@
           
           
           
-          <button class="add-to-cart-btn" id="addToCartBtn">Add to Cart</button>
+          <div class="product-actions">
+            <button type="button" class="add-to-cart-btn" id="addToCartBtn">Add to Cart</button>
+            <button type="button" class="buy-now-btn" id="buyNowBtn">Buy Now</button>
+          </div>
         </div>
       </div>
     </div>
