@@ -78,6 +78,9 @@ def sold_products():
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
+    if not SMTP_USER or not SMTP_PASS:
+        return 'Email is not configured on this server (missing SMTP_USER/SMTP_PASS environment variables)', 500
+
     # form fields are in request.form, cart possibly in request.form['cart']
     form = request.form.to_dict()
 
@@ -108,18 +111,21 @@ def submit_order():
             body_lines.append(f"{key}: {value}")
     body = "\n".join(body_lines)
 
-    msg = EmailMessage()
-    msg['Subject'] = 'New customer order'
-    msg['From'] = SMTP_USER
-    msg['To'] = TO_ADDRESS
-    # explicitly set plain-text body (no attachments, no HTML part)
-    msg.set_content(body, subtype='plain')
-    # some email clients display multipart messages differently; by
-    # ensuring the message has only a text/plain part we avoid any
-    # documents or attachments appearing in the received mail.
-
+    # Everything below can fail in ways specific to the hosting environment (bad
+    # config, network/DNS issues, mail server refusing the connection, timeouts) -
+    # keep it all inside one try/except so a customer never sees a raw stack trace.
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+        msg = EmailMessage()
+        msg['Subject'] = 'New customer order'
+        msg['From'] = SMTP_USER
+        msg['To'] = TO_ADDRESS
+        # explicitly set plain-text body (no attachments, no HTML part)
+        msg.set_content(body, subtype='plain')
+        # some email clients display multipart messages differently; by
+        # ensuring the message has only a text/plain part we avoid any
+        # documents or attachments appearing in the received mail.
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
             smtp.starttls()
             smtp.login(SMTP_USER, SMTP_PASS)
             smtp.send_message(msg)
@@ -127,13 +133,20 @@ def submit_order():
         return f"Failed to send email: {e}", 500
 
     # order confirmed - mark each painting in the cart as sold so it shows
-    # "Sold" everywhere (homepage, shop grid, its own page) for every visitor
-    mark_products_sold([item.get('id') for item in cart_items if isinstance(item, dict)])
+    # "Sold" everywhere (homepage, shop grid, its own page) for every visitor.
+    # Never let a storage hiccup here turn an already-successful order into an error.
+    try:
+        mark_products_sold([item.get('id') for item in cart_items if isinstance(item, dict)])
+    except Exception as e:
+        print(f"Warning: order sent but failed to mark products sold: {e}")
 
     return 'OK', 200
 
 @app.route('/submit_commission', methods=['POST'])
 def submit_commission():
+    if not SMTP_USER or not SMTP_PASS:
+        return 'Email is not configured on this server (missing SMTP_USER/SMTP_PASS environment variables)', 500
+
     form = request.form.to_dict()
 
     # Build email body for commission
@@ -164,14 +177,14 @@ def submit_commission():
 
     body = "\n".join(body_lines)
 
-    msg = EmailMessage()
-    msg['Subject'] = 'New Commission Request'
-    msg['From'] = SMTP_USER
-    msg['To'] = TO_ADDRESS
-    msg.set_content(body, subtype='plain')
-
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+        msg = EmailMessage()
+        msg['Subject'] = 'New Commission Request'
+        msg['From'] = SMTP_USER
+        msg['To'] = TO_ADDRESS
+        msg.set_content(body, subtype='plain')
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
             smtp.starttls()
             smtp.login(SMTP_USER, SMTP_PASS)
             smtp.send_message(msg)
@@ -184,6 +197,9 @@ def submit_commission():
 
 @app.route('/submit_contact', methods=['POST'])
 def submit_contact():
+    if not SMTP_USER or not SMTP_PASS:
+        return 'Email is not configured on this server (missing SMTP_USER/SMTP_PASS environment variables)', 500
+
     form = request.form.to_dict()
 
     # Build email body for contact form
@@ -211,14 +227,14 @@ def submit_contact():
 
     body = "\n".join(body_lines)
 
-    msg = EmailMessage()
-    msg['Subject'] = f'Contact Form: {form.get("subject", "General Enquiry")}'
-    msg['From'] = SMTP_USER
-    msg['To'] = TO_ADDRESS
-    msg.set_content(body, subtype='plain')
-
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+        msg = EmailMessage()
+        msg['Subject'] = f'Contact Form: {form.get("subject", "General Enquiry")}'
+        msg['From'] = SMTP_USER
+        msg['To'] = TO_ADDRESS
+        msg.set_content(body, subtype='plain')
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
             smtp.starttls()
             smtp.login(SMTP_USER, SMTP_PASS)
             smtp.send_message(msg)
