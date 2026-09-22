@@ -289,6 +289,12 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--b
 .product-title{font-size:1.2rem;color:var(--fg);font-weight:600;letter-spacing:0.08em}
 .product-price{font-size:1rem;color:var(--muted);letter-spacing:0.05em}
 
+/* Sold paintings: badge, dimmed image, struck-through price (applied by markSoldProducts() in script.js) */
+.product-frame.is-sold img{opacity:0.55;filter:grayscale(30%)}
+.sold-badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,0.95);color:#0f1419;border:1px solid rgba(0,0,0,0.15);padding:6px 14px;font-size:0.65rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;z-index:5;pointer-events:none}
+.product-price .price-was{text-decoration:line-through;color:var(--muted)}
+.product-price .sold-label{color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-left:8px}
+
 .gallery-footer{display:flex;justify-content:center;margin-top:40px}
 .shop-button{background:transparent;color:var(--fg);border:2px solid var(--fg);padding:14px 48px;font-size:0.9rem;letter-spacing:0.12em;font-weight:600;cursor:pointer;text-transform:uppercase;transition:all 0.4s ease}
 .shop-button:hover{background:var(--fg);color:var(--bg)}

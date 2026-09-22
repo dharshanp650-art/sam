@@ -1,8 +1,14 @@
 import os
 import json
+import threading
 from flask import Flask, request, send_from_directory
 import smtplib
 from email.message import EmailMessage
+
+try:
+    import fcntl  # POSIX only (Hostinger/Linux) - guards sold_products.json across worker processes
+except ImportError:
+    fcntl = None
 
 # create flask app, serve static files from current directory
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -15,6 +21,47 @@ SMTP_USER = os.environ.get('SMTP_USER')
 SMTP_PASS = os.environ.get('SMTP_PASS')
 TO_ADDRESS = os.environ.get('TO_ADDRESS', SMTP_USER)
 
+# Sold paintings are tracked here, keyed by the same product id used in
+# data-product-id / productDetailData. A painting is added the moment an
+# order containing it is successfully placed (see /submit_order below) -
+# no one needs to edit this file by hand.
+SOLD_PRODUCTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sold_products.json')
+_sold_products_lock = threading.Lock()
+
+def load_sold_products():
+    try:
+        with open(SOLD_PRODUCTS_FILE, 'r') as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+def mark_products_sold(product_ids):
+    if not product_ids:
+        return
+    # threading.Lock only guards against other threads in this process; Hostinger's
+    # Python App hosting can run several worker processes, so also take an OS-level
+    # file lock (POSIX flock) around the read-modify-write so two simultaneous
+    # orders can't clobber each other's update.
+    with _sold_products_lock:
+        lock_file = open(SOLD_PRODUCTS_FILE + '.lock', 'a')
+        try:
+            if fcntl:
+                fcntl.flock(lock_file, fcntl.LOCK_EX)
+            sold = load_sold_products()
+            changed = False
+            for pid in product_ids:
+                if pid and pid not in sold:
+                    sold.append(pid)
+                    changed = True
+            if changed:
+                with open(SOLD_PRODUCTS_FILE, 'w') as f:
+                    json.dump(sold, f)
+        finally:
+            if fcntl:
+                fcntl.flock(lock_file, fcntl.LOCK_UN)
+            lock_file.close()
+
 @app.route('/')
 def index():
     # serve index.html from workspace root
@@ -25,25 +72,37 @@ def index():
 def serve_static(filename):
     return send_from_directory('.', filename)
 
+@app.route('/api/sold-products')
+def sold_products():
+    return {'sold': load_sold_products()}
+
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
     # form fields are in request.form, cart possibly in request.form['cart']
     form = request.form.to_dict()
+
+    # parse the cart once - used both for the email body and, once the order
+    # is confirmed sent, to mark each purchased painting as sold
+    cart_items = []
+    cart_raw = form.get('cart')
+    if cart_raw:
+        try:
+            cart_items = json.loads(cart_raw)
+        except Exception:
+            cart_items = []
 
     # build a plain-text message summarizing order; expand cart JSON for readability
     body_lines = []
     for key, value in form.items():
         if key == 'cart':
             body_lines.append('Cart items:')
-            try:
-                items = json.loads(value)
-                # each item will be a dict with its own fields
-                for idx, item in enumerate(items, start=1):
+            if cart_items:
+                for idx, item in enumerate(cart_items, start=1):
                     body_lines.append(f"  {idx}.")
                     for k, v in item.items():
                         body_lines.append(f"    {k}: {v}")
-            except Exception:
-                # if parsing fails, just include raw string
+            else:
+                # parsing failed earlier, just include raw string
                 body_lines.append(value)
         else:
             body_lines.append(f"{key}: {value}")
@@ -66,6 +125,10 @@ def submit_order():
             smtp.send_message(msg)
     except Exception as e:
         return f"Failed to send email: {e}", 500
+
+    # order confirmed - mark each painting in the cart as sold so it shows
+    # "Sold" everywhere (homepage, shop grid, its own page) for every visitor
+    mark_products_sold([item.get('id') for item in cart_items if isinstance(item, dict)])
 
     return 'OK', 200
 

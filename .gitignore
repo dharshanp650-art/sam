@@ -1,3 +1,7 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# live sold-orders data - must never be overwritten by a git deploy on the server
+sold_products.json
+sold_products.json.lock

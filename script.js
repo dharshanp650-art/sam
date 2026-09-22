@@ -1,3 +1,51 @@
+// Single source of truth for sold paintings, tracked server-side (see sold_products.json
+// and the /api/sold-products, /submit_order routes in app.py). A painting is added to this
+// list automatically the moment a customer's order for it is successfully placed — nobody
+// needs to edit this by hand. Starts empty and is populated by loadSoldProducts() below.
+let SOLD_PRODUCT_IDS = [];
+
+// Mark sold paintings with a badge, dimmed image, and struck-through price
+// on any page that renders .product-card elements (homepage carousels, shop grid, etc.)
+function markSoldProducts(){
+  document.querySelectorAll('.product-card').forEach(card=>{
+    const isSold = SOLD_PRODUCT_IDS.includes(card.dataset.productId);
+    if(!isSold) return;
+
+    const frame = card.querySelector('.product-frame');
+    if(frame && !frame.querySelector('.sold-badge')){
+      frame.classList.add('is-sold');
+      const badge = document.createElement('span');
+      badge.className = 'sold-badge';
+      badge.textContent = 'Sold';
+      frame.appendChild(badge);
+    }
+
+    const priceEl = card.querySelector('.product-price');
+    if(priceEl && !priceEl.querySelector('.sold-label')){
+      const priceText = priceEl.textContent.trim();
+      priceEl.innerHTML = '<span class="price-was">' + priceText + '</span><span class="sold-label">Sold</span>';
+    }
+  });
+}
+
+// Fetch the live sold-products list from the server, then apply it to any product
+// cards on the page and notify listeners (e.g. the product-detail page) it's ready.
+async function loadSoldProducts(){
+  try {
+    const res = await fetch('/api/sold-products');
+    if(res.ok){
+      const data = await res.json();
+      SOLD_PRODUCT_IDS = Array.isArray(data.sold) ? data.sold : [];
+    }
+  } catch(err){
+    console.warn('Could not load sold products list', err);
+  }
+  markSoldProducts();
+  document.dispatchEvent(new CustomEvent('sold-products-updated'));
+}
+
+document.addEventListener('DOMContentLoaded', loadSoldProducts);
+
 // Video background initialization
 document.addEventListener('DOMContentLoaded',()=>{
   const video=document.querySelector('.hero-video');
@@ -792,7 +840,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('product') || urlParams.get('id') || 'ethereal-light';
     const product = productDetailData[productId];
-    
+
+    const statusEl = document.getElementById('productStatus');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+
+    // Reflects SOLD_PRODUCT_IDS onto the status badge and Add to Cart button. Called
+    // once on load and again once the live sold list has finished loading from the server.
+    function refreshSoldState(){
+      const sold = !!product && SOLD_PRODUCT_IDS.includes(productId);
+      if(statusEl){
+        statusEl.textContent = sold ? 'Sold' : (product ? (product.status || 'Available') : '');
+        statusEl.classList.toggle('sold', sold);
+      }
+      if(addToCartBtn){
+        addToCartBtn.disabled = sold;
+        addToCartBtn.textContent = sold ? 'Sold Out' : 'Add to Cart';
+      }
+    }
+
     if(product){
       document.getElementById('productTitle').textContent = product.title;
       document.getElementById('productTitleAbout').textContent = product.title + ' by ' + product.artist;
@@ -802,21 +867,22 @@ document.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('productDescription').textContent = product.description;
       document.getElementById('productMedium').textContent = product.medium;
       document.getElementById('productSize').textContent = product.size;
-      
+
       // Add the new fields
       const ratingEl = document.getElementById('productRating');
-      const statusEl = document.getElementById('productStatus');
       const imageSizeEl = document.getElementById('productImageSize');
       const frameColorEl = document.getElementById('productFrameColor');
-      
+
       if(ratingEl) ratingEl.textContent = product.rating + ' / 5.0';
-      if(statusEl) statusEl.textContent = product.status;
       if(imageSizeEl) imageSizeEl.textContent = product.imageSize + ' px';
       if(frameColorEl) frameColorEl.textContent = product.frameColor;
-      
+
       document.title = product.title + ' - SAMANTHA';
     }
-    
+
+    refreshSoldState();
+    document.addEventListener('sold-products-updated', refreshSoldState);
+
     // Quantity controls
     const qtyPlus = document.getElementById('qtyPlus');
     const qtyMinus = document.getElementById('qtyMinus');
@@ -837,9 +903,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
     
     // Add to cart
-    const addToCartBtn = document.getElementById('addToCartBtn');
     if(addToCartBtn){
       addToCartBtn.addEventListener('click',()=>{
+        if(SOLD_PRODUCT_IDS.includes(productId)) return;
         const qty = parseInt(qtyInput?.value || 1);
         const size = document.getElementById('sizeSelect')?.value || '100 × 100 cm';
         const frame = document.getElementById('frameSelect')?.value || 'Black';
@@ -1627,6 +1693,88 @@ document.addEventListener('DOMContentLoaded', ()=>{
       }
     });
   }
+});
+
+// State/province lists for countries that use them; other countries fall back to free text
+const STATES_BY_COUNTRY = {
+  US: {
+    label: 'State*',
+    placeholder: 'Select State',
+    options: [
+      ['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],
+      ['CO','Colorado'],['CT','Connecticut'],['DE','Delaware'],['DC','District of Columbia'],
+      ['FL','Florida'],['GA','Georgia'],['HI','Hawaii'],['ID','Idaho'],['IL','Illinois'],
+      ['IN','Indiana'],['IA','Iowa'],['KS','Kansas'],['KY','Kentucky'],['LA','Louisiana'],
+      ['ME','Maine'],['MD','Maryland'],['MA','Massachusetts'],['MI','Michigan'],['MN','Minnesota'],
+      ['MS','Mississippi'],['MO','Missouri'],['MT','Montana'],['NE','Nebraska'],['NV','Nevada'],
+      ['NH','New Hampshire'],['NJ','New Jersey'],['NM','New Mexico'],['NY','New York'],
+      ['NC','North Carolina'],['ND','North Dakota'],['OH','Ohio'],['OK','Oklahoma'],['OR','Oregon'],
+      ['PA','Pennsylvania'],['RI','Rhode Island'],['SC','South Carolina'],['SD','South Dakota'],
+      ['TN','Tennessee'],['TX','Texas'],['UT','Utah'],['VT','Vermont'],['VA','Virginia'],
+      ['WA','Washington'],['WV','West Virginia'],['WI','Wisconsin'],['WY','Wyoming']
+    ]
+  },
+  CA: {
+    label: 'Province/Territory*',
+    placeholder: 'Select Province',
+    options: [
+      ['AB','Alberta'],['BC','British Columbia'],['MB','Manitoba'],['NB','New Brunswick'],
+      ['NL','Newfoundland and Labrador'],['NS','Nova Scotia'],['NT','Northwest Territories'],
+      ['NU','Nunavut'],['ON','Ontario'],['PE','Prince Edward Island'],['QC','Quebec'],
+      ['SK','Saskatchewan'],['YT','Yukon']
+    ]
+  },
+  AU: {
+    label: 'State/Territory*',
+    placeholder: 'Select State',
+    options: [
+      ['ACT','Australian Capital Territory'],['NSW','New South Wales'],['NT','Northern Territory'],
+      ['QLD','Queensland'],['SA','South Australia'],['TAS','Tasmania'],['VIC','Victoria'],['WA','Western Australia']
+    ]
+  }
+};
+
+// Rebuild the State field to match the selected country: a dropdown for countries
+// with known states/provinces, otherwise a free-text field (previously it was
+// always the US states list, so e.g. selecting Germany still showed Alabama..Wyoming)
+function renderStateField(countryCode){
+  const current = document.getElementById('state');
+  if(!current) return;
+  const group = current.closest('.form-group');
+  const labelEl = group ? group.querySelector('.form-label') : null;
+  const data = STATES_BY_COUNTRY[countryCode];
+  const previousValue = current.value;
+  let el;
+
+  if(data){
+    el = document.createElement('select');
+    el.className = 'form-select';
+    el.innerHTML = '<option value="">' + data.placeholder + '</option>' +
+      data.options.map(([value,label])=>`<option value="${value}">${label}</option>`).join('');
+    if(labelEl) labelEl.textContent = data.label;
+  } else {
+    el = document.createElement('input');
+    el.type = 'text';
+    el.className = 'form-input';
+    el.placeholder = 'State / Province / Region';
+    if(labelEl) labelEl.textContent = 'State/Province/Region*';
+  }
+
+  el.id = 'state';
+  el.required = true;
+  current.replaceWith(el);
+
+  // keep a manually-typed value when switching between two free-text countries
+  if(!data && previousValue){
+    el.value = previousValue;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const countryEl = document.getElementById('country');
+  if(!countryEl) return;
+  renderStateField(countryEl.value);
+  countryEl.addEventListener('change', ()=> renderStateField(countryEl.value));
 });
 
 // Load cart items on checkout page
