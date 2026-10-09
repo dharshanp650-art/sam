@@ -567,18 +567,17 @@
       <div class="products-controls">
         <aside class="filters-sidebar" aria-label="Filters">
           <div class="filter-bar">
+
             
 
-           
             
-
             <div class="filter-item">
               <button class="filter-toggle" data-target="price-options">Price</button>
               <div class="filter-options" id="price-options">
-                <label><input type="checkbox" value="under-100"> Under $100</label>
-                <label><input type="checkbox" value="100-250"> $100 - $250</label>
-                <label><input type="checkbox" value="250-500"> $250 - $500</label>
-                <label><input type="checkbox" value="over-500"> Over $500</label>
+                <label><input type="checkbox" value="under-100"> Under £100</label>
+                <label><input type="checkbox" value="100-250"> £100 - £250</label>
+                <label><input type="checkbox" value="250-500"> £250 - £500</label>
+                <label><input type="checkbox" value="over-500"> Over £500</label>
               </div>
             </div>
           </div>
@@ -587,12 +586,15 @@
         <div class="controls-right">
           <div class="products-sort-section">
             <div class="products-sort-container">
-              <span class="products-sort-label">Sort by:</span>
-              <select class="sort-select">
-                <option value="alphabetical">ALPHABETICALLY, A-Z</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
+              <span class="products-sort-label">Category:</span>
+              <select class="sort-select" id="categorySelect">
+                <option value="">All Categories</option>
+                <option value="clouds">Clouds</option>
+                <option value="stars">Stars</option>
+                <option value="natural-disasters">Natural Disasters</option>
+                <option value="landscapes">Landscapes</option>
+                <option value="drawings">Drawings</option>
+                <option value="exhibition">Exhibition</option>
               </select>
             </div>
           </div>
@@ -675,469 +677,13 @@
         });
       </script>
 
-      <div class="products-grid">
-        <!-- Product 1 -->
-        <div class="product-card" data-product-id="ivefoundit" data-artist="Sam Dougherty" data-size="small" data-frame="black" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="ihavefoundit.webp" alt="Rodeo">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">I’ve Found It (2022)</p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 2 -->
-        <div class="product-card" data-product-id="bliss" data-artist="Sam Dougherty" data-size="medium" data-frame="white" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="bliss.png" alt="Teeber Rodeo">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Bliss (2019)</p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 3 -->
-        <div class="product-card" data-product-id="kourtney" data-artist="Sam Dougherty" data-size="large" data-frame="black" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="kourtney.png" alt="Top of Innsbruck">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Kourtney (2019)</p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 4 -->
-        <div class="product-card" data-product-id="fordad" data-artist="Sam Dougherty" data-size="large" data-frame="black" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="fordad.webp" alt="Painting">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">For Dad (2021) </p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 5 -->
-        <div class="product-card" data-product-id="ivefoundit-i" data-artist="James Chen" data-size="xlarge" data-frame="white" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="i’ve found it i.webp" alt="Mountain Whispers">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">I’ve Found It I (2022) </p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 6 -->
-        <div class="product-card" data-product-id="european-championship" data-artist="Maya Patel" data-size="medium" data-frame="black" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="european women’s championship.webp" alt="Urban Pulse">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">European Women’s Championship (July 31st 2022)</p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 7 -->
-        <div class="product-card" data-product-id="illlookup" data-artist="Elena Martinez" data-size="large" data-frame="black" data-price="769">
-          <div class="product-frame frame-dark">
-            <img src="i’ll look up forever.webp" alt="Ethereal Light">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">I’ll Look Up Forever </p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 8 -->
-        <div class="product-card" data-product-id="wecanhope" data-artist="Sam Dougherty" data-size="medium" data-frame="white" data-price="260">
-          <div class="product-frame frame-dark">
-            <img src="we can only hope.png" alt="Ocean Serenity">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">We Can Only Hope</p>
-            <p class="product-price">From $260.00</p>
-          </div>
-        </div>
-
-        <!-- Product 9 -->
-       
-
-        <!-- Product 10 -->
-        <div class="product-card" data-product-id="kourtney-vertical" data-artist="Lisa Wong" data-size="medium" data-frame="black" data-price="275">
-          <div class="product-frame frame-rectangle-v">
-            <img src="kourtney.png" alt="Vertical Frame">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Kourtney (2019) </p>
-            <p class="product-price">£769</p>
-          </div>
-        </div>
-
-        <!-- Product 11 -->
-        <div class="product-card" data-product-id="beyond-words" data-artist="David Brown" data-size="large" data-frame="black" data-price="300">
-          <div class="product-frame frame-dark">
-            <img src="beyond words (2019).webp" alt="Abstract Dreams">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name">David Brown</p>
-            <p class="product-title">Beyond Words (2019)</p>
-            <p class="product-price">From $300.00</p>
-          </div>
-        </div>
-
-        
-
-        <!-- Product 13 -->
-        <div class="product-card" data-product-id="untitled-ii" data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
-          <div class="product-frame frame-rectangle-v">
-            <img src="untitled ii (2019).webp" alt="Moonlight">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Untitled II (2019)</p>
-            <p class="product-price">From $220.00</p>
-          </div>
-        </div>
-
-        <!-- Product 14 -->
-        <div class="product-card" data-product-id="candyfloss-clouds" data-artist="Christine Lee" data-size="xlarge" data-frame="black" data-price="380">
-          <div class="product-frame frame-dark">
-            <img src="candy floss clouds (2019).webp" alt="Serenity">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Candy Floss Clouds (2019)</p>
-            <p class="product-price">From $380.00</p>
-          </div>
-        </div>
-
-        
-       
-
-        <!-- Product 17 -->
-        <div class="product-card" data-product-id="findmethemoon" data-artist="Pierre Dubois" data-size="large" data-frame="black" data-price="330">
-          <div class="product-frame frame-dark">
-            <img src="find me the moon (2022).webp" alt="Lavender Fields">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Find Me the Moon (2022)</p>
-            <p class="product-price">From $330.00</p>
-          </div>
-        </div>
-
-
-        
-
-        <!-- Product 20 -->
-        <div class="product-card" data-product-id="findmethemoon-i" data-artist="Emma Watson" data-size="large" data-frame="black" data-price="340">
-          <div class="product-frame frame-dark">
-            <img src="find me the moon i (2022).webp" alt="Autumn Leaves">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Find Me the Moon I (2022)</p>
-            <p class="product-price">From $340.00</p>
-          </div>
-        </div>
-
-        
-
-       
-
-        <!-- Product 23 -->
-        <div class="product-card" data-product-id="wellingborough" data-artist="James Mitchell" data-size="large" data-frame="black" data-price="320">
-          <div class="product-frame frame-dark">
-            <img src="wellingborough (2020).webp" alt="Forest Path">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Wellingborough (2020)</p>
-            <p class="product-price">From $320.00</p>
-          </div>
-        </div>
-
-
-        
-
-        <!-- Product 26 -->
-        <div class="product-card" data-product-id="hurricane-maria" data-artist="Maria Santos" data-size="xlarge" data-frame="black" data-price="400">
-          <div class="product-frame frame-dark">
-            <img src="hurricane maria (2020).png" alt="Ocean Waves">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name">Maria Santos</p>
-            <p class="product-title">Hurricane Maria (2020)</p>
-            <p class="product-price">From $400.00</p>
-          </div>
-        </div>
-
-       
-
-        
-
-        <!-- Product 29 -->
-        <div class="product-card" data-product-id="hurricane-katrina" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="hurricane katrina (2020).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Hurricane Katrina (2020) </p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-        
-
-        
-        <div class="product-card" data-product-id="storm-andre" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-            <div class="product-frame frame-dark">
-            <img src="storm andré (2020).png" alt="Midnight Stars">
-          <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Storm André (2020)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-        
-        <div class="product-card" data-product-id="mount-lamington" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-            <div class="product-frame frame-dark">
-            <img src="mount lamington (2020).png" alt="Midnight Stars">
-          <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Mount Lamington (2020)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-        <div class="product-card" data-product-id="mount-sinabung" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-           <div class="product-frame frame-dark">
-            <img src="mount sinabung (2018).png" alt="Midnight Stars">
-          <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Mount Sinabung (2018)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-
-        <div class="product-card" data-product-id="mount-st-helens" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-            <div class="product-frame frame-dark">
-            <img src="mount st. helens (2020).webp" alt="Midnight Stars">
-          <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Mount St. Helens (2020)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-        
-        
-         <div class="product-card" data-product-id="great-smog-1952" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-            <div class="product-frame frame-dark">
-            <img src="the great smog of 1952 (2020).webp" alt="Midnight Stars">
-          <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">The Great Smog of 1952 (2020)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-
-
-         <div class="product-card" data-product-id="australian-fires-2020" data-artist="Samantha Ellis" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="australian fires (2020).webp" alt="Midnight Stars">
-          
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Australian Fires (2020)</p>
-            <p class="product-price">From $769.00</p>
-          </div>
-        </div>
-
-
-         <div class="product-card" data-product-id="icant-lift-my-head-2021" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-      
-        <div class="product-frame frame-dark">
-            <img src="i can’t lift my head (2021).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">  
-            <p class="artist-name"></p>
-            <p class="product-title">I Can’t Lift My Head (2021)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-         
-        <div class="product-card" data-product-id="contrasting-waves-2017" data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
-          <div class="product-frame frame-rectangle-v">
-            <img src="contrasting waves (2017).webp" alt="Moonlight">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Contrasting Waves (2017)</p>
-            <p class="product-price">From $220.00</p>
-          </div>
-        </div>
-        
-
-         <div class="product-card" data-product-id="untitled2019" data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
-          <div class="product-frame frame-rectangle-v">
-            <img src="untiltled.png" alt="Moonlight">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Untitled (2019)</p>
-            <p class="product-price">From $220.00</p>
-          </div>
-        </div>
-
-
-         <div class="product-card" data-product-id="untitled-I-2019"data-artist="Alex Kim" data-size="small" data-frame="black" data-price="220">
-          <div class="product-frame frame-rectangle-v">
-            <img src="untitled i.png" alt="Moonlight">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Untitled I (2019)</p>
-            <p class="product-price">From $220.00</p>
-          </div>
-        </div>
-
-
-         <div class="product-card" data-product-id="Charles Darwin" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="charles darwin (24th november 1859) (2022).jpg" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Charles Darwin (24th November 1859) (2022)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-
-
-
-         <div class="product-card" data-product-id="Emily Davision" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="emily davison (4th june 1913) (2022).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Emily Davison (4th June 1913) (2022)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-         <div class="product-card" data-product-id="Emmett Till" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="emmett till (21st august 1955) (2022).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Emmett Till (21st August 1955) (2022)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-         <div class="product-card" data-product-id="" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="yuri gagarin (12th april 1961) (2022).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Yuri Gagarin (12th April 1961) (2022)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-<div class="product-card" data-product-id="Stonewall Riots" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="stonewall riots (27th june 1969) (2022).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Stonewall Riots (27th June 1969) (2022)</p>
-            <p class="product-price">From $959.00</p>
-          </div>
-        </div>
-
-        <div class="product-card" data-product-id="Sarah Everard" data-artist="Antonio Rossi" data-size="large" data-frame="black" data-price="360">
-          <div class="product-frame frame-dark">
-            <img src="sarah everard (12th march 2021) (2022).webp" alt="Midnight Stars">
-            <div class="quick-view"><button>QUICK VIEW</button></div>
-          </div>
-          <div class="product-info">
-            <p class="artist-name"></p>
-            <p class="product-title">Sarah Everard (12th March 2021) (2022)</p>
-            <p class="product-price">From $360.00</p>
-          </div>
-        </div>
-
-        
-        
-
-
-      </div>
+      <div class="products-grid"></div>
     </div>
 
+    <script src="products-data.js"></script>
     <script src="script.js"></script>
     <script>
-      // Apply filters based on checked boxes in the filter options
+      // Apply filters based on checked boxes in the filter options + the category select
       function applyFilters(){
         const selected = {
           artist: Array.from(document.querySelectorAll('#artist-options input[type="checkbox"]:checked')).map(i=>i.value),
@@ -1145,6 +691,7 @@
           frame: Array.from(document.querySelectorAll('#frame-options input[type="checkbox"]:checked')).map(i=>i.value),
           price: Array.from(document.querySelectorAll('#price-options input[type="checkbox"]:checked')).map(i=>i.value)
         };
+        const category = document.getElementById('categorySelect')?.value || '';
 
         const cards = document.querySelectorAll('.product-card');
         cards.forEach(card=>{
@@ -1157,6 +704,7 @@
           if(selected.artist.length && !selected.artist.includes(artist)) visible = false;
           if(selected.size.length && !selected.size.includes(size)) visible = false;
           if(selected.frame.length && !selected.frame.includes(frame)) visible = false;
+          if(category && card.dataset.category !== category) visible = false;
 
           if(selected.price.length){
             const match = selected.price.some(range=>{
@@ -1179,16 +727,7 @@
           cb.addEventListener('change', applyFilters);
         });
 
-        // Quick view button functionality
-        const quickViewButtons = document.querySelectorAll('.product-frame .quick-view button');
-        quickViewButtons.forEach(button => {
-          button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const productCard = button.closest('.product-card');
-            const title = productCard.querySelector('.product-title').textContent;
-            console.log('Quick view clicked for:', title);
-          });
-        });
+        document.getElementById('categorySelect')?.addEventListener('change', applyFilters);
 
         applyFilters();
       });

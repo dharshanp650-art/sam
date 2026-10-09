@@ -136,19 +136,61 @@
         line-height: 1.7;
         color: var(--muted);
       }
-      
+
       .product-about-title {
         font-weight: 600;
         color: var(--fg);
         margin-bottom: 12px;
         font-size: 1rem;
       }
-      
+
+      #productDescription {
+        white-space: pre-line;
+      }
+
       .read-more {
+        display: inline-block;
+        margin-top: 12px;
         color: var(--fg);
         text-decoration: underline;
         cursor: pointer;
         font-weight: 600;
+      }
+
+      .product-extra {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .extra-block[hidden] {
+        display: none;
+      }
+
+      .extra-heading {
+        font-weight: 600;
+        color: var(--fg);
+        margin: 0 0 10px 0;
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .extra-list {
+        margin: 0;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+
+      .extra-list a {
+        color: var(--fg);
+        word-break: break-word;
       }
       
       .product-specs {
@@ -397,7 +439,17 @@
             <p id="productDescription">
               Inspired by drifting skies and soft cloud formations, this piece captures the stillness and serenity of the atmosphere.
             </p>
-            <a href="#" class="read-more">Read more</a>
+            <a href="#" class="read-more" id="readMoreLink" hidden>Read more</a>
+            <div class="product-extra" id="productExtra" hidden>
+              <div class="extra-block" id="furtherReadingBlock" hidden>
+                <h3 class="extra-heading">Further Reading and Information</h3>
+                <ul class="extra-list" id="productFurtherReading"></ul>
+              </div>
+              <div class="extra-block" id="referencesBlock" hidden>
+                <h3 class="extra-heading">References</h3>
+                <ol class="extra-list" id="productReferences"></ol>
+              </div>
+            </div>
           </div>
           
           <div class="product-specs">
@@ -429,6 +481,7 @@
       </div>
     </div>
 
+    <script src="products-data.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

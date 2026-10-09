@@ -28,6 +28,55 @@ function markSoldProducts(){
   });
 }
 
+// Builds a .product-card DOM node from a PRODUCTS entry (products-data.js), matching
+// the exact markup/class/attribute contract every other system already expects
+// (markSoldProducts, applyFilters, the shop-page click-to-detail handler, quick-view).
+function buildProductCardElement(id){
+  const p = PRODUCTS[id];
+  if(!p) return null;
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.dataset.productId = id;
+  card.dataset.artist = p.artist;
+  card.dataset.size = p.sizeCategory;
+  card.dataset.frame = p.frame;
+  card.dataset.price = String(p.price);
+  card.dataset.category = p.category;
+
+  card.innerHTML = `
+    <div class="product-frame frame-${p.cardFrameStyle}">
+      <img src="${p.image}" alt="${p.alt || p.title}">
+      <div class="quick-view"><button>QUICK VIEW</button></div>
+    </div>
+    <div class="product-info">
+      <p class="artist-name"></p>
+      <p class="product-title">${p.title}</p>
+      <p class="product-price">${formatPrice(p.price)}</p>
+    </div>`;
+  return card;
+}
+
+function renderProductCards(containerEl, ids){
+  if(!containerEl) return;
+  containerEl.innerHTML = '';
+  ids.forEach(id=>{
+    const card = buildProductCardElement(id);
+    if(card) containerEl.appendChild(card);
+  });
+}
+
+// Populate the shop grid and homepage carousels from the shared product data, before
+// anything else on the page (filters, quick-view, sold badges) needs to query .product-card.
+document.addEventListener('DOMContentLoaded', ()=>{
+  const grid = document.querySelector('.shop-page .products-grid');
+  if(grid) renderProductCards(grid, SHOP_GRID_ORDER);
+
+  const featured = document.querySelector('.featured-carousel');
+  const trending = document.querySelector('.trending-carousel');
+  if(featured) renderProductCards(featured, FEATURED_CAROUSEL_ORDER);
+  if(trending) renderProductCards(trending, TRENDING_CAROUSEL_ORDER);
+});
+
 // Fetch the live sold-products list from the server, then apply it to any product
 // cards on the page and notify listeners (e.g. the product-detail page) it's ready.
 async function loadSoldProducts(){
@@ -428,16 +477,6 @@ if(featuredCarousel){
   const modal=document.getElementById('quickViewModal');
   const featuredQuickViewButtons=document.querySelectorAll('.featured-carousel .quick-view button');
   
-  const featuredProductData={
-    'ifoundit':{title:'I Found It (2022)',artist:'Samantha Ellis',price:'£769.00',image:'ihavefoundit.webp',images:['ihavefoundit.webp','ihavefoundit.webp','ihavefoundit.webp'],description:'Discover the essence of finding what matters most in this stunning piece.'},
-    'bliss':{title:'Bliss (2019)',artist:'Samantha Ellis',price:'£769.00',image:'bliss.png',images:['bliss.png','Bliss (2019)_frame.png','Bliss (2019)_pre.png'],description:'A serene exploration of pure happiness and peaceful moments.'},
-    'findmethemoon':{title:'Find Me the Moon (2022)',artist:'Samantha Ellis',price:'£330.00',image:'find me the moon (2022).webp',images:['find me the moon (2022).webp','find me the moon (2022)_frame.png','find me the moon (2022)_pre.png'],description:'A dreamy nocturnal piece celebrating celestial beauty.'},
-    'fordad':{title:'For Dad (2021)',artist:'Samantha Ellis',price:'£769.00',image:'fordad.webp',images:['fordad.webp','for dad (2021)_frame.png','for dad (2021)_pre.png'],description:'A tribute to cherished moments and special bonds.'},
-    'beyondwords':{title:'Beyond Words (2019)',artist:'Samantha Ellis',price:'£300.00',image:'beyond words (2019).webp',images:['beyond words (2019).webp','beyond words (2019)_frame.png','beyond words (2019)_pre.png'],description:'Expressive artwork that transcends verbal communication.'},
-    'wehope':{title:'We Hope (2020)',artist:'Samantha Ellis',price:'£260.00',image:'we can only hope.png',images:['we can only hope.png','we can only hope (2019)_pre.png','we can only hope (2019)_pre.png'],description:'An inspiring piece celebrating hope and possibilities.'},
-    'candyclouds':{title:'Candy Floss Clouds (2019)',artist:'Samantha Ellis',price:'£380.00',image:'candy floss clouds (2019).webp',images:['candy floss clouds (2019).webp','candy floss clouds (2019)_frame.png','candy floss clouds (2019)_pre.png'],description:'Whimsical clouds rendered in delightful colors.'}
-  };
-  
   featuredQuickViewButtons.forEach((btn)=>{
     btn.addEventListener('click',(e)=>{
       e.preventDefault();
@@ -455,23 +494,24 @@ if(featuredCarousel){
       if(!productCard) return;
       
       const productId=productCard.getAttribute('data-product-id');
-      const product=productId?featuredProductData[productId]:null;
-      
+      const product=productId?PRODUCTS[productId]:null;
+
       if(product && modal){
         // Update modal content
         const modalGalleryImages=product.images||[product.image];
         const modalImgEl=document.getElementById('modalProductImage');
-        
+
         if(modalImgEl) modalImgEl.src=modalGalleryImages[0];
         document.getElementById('modalArtistName').textContent=product.artist;
         document.getElementById('modalProductTitle').textContent=product.title;
-        document.getElementById('modalPrice').textContent=product.price;
+        document.getElementById('modalPrice').textContent=formatPrice(product.price);
         document.getElementById('modalDescription').textContent=product.description;
-        
+
         // Store modal gallery data on window for nav buttons to use
         window.featuredModalImages=modalGalleryImages;
         window.featuredModalIndex=0;
-        
+        window.currentFeaturedProductId=productId;
+
         modal.classList.add('active');
       }
     });
@@ -627,16 +667,6 @@ if(trendingCarousel){
   const modal=document.getElementById('trendingQuickViewModal');
   const trendingQuickViewButtons=document.querySelectorAll('.trending-carousel .quick-view button');
   
-  const trendingProductData={
-    'ifoundit':{title:'I Found It (2022)',artist:'Samantha Ellis',price:'£769.00',image:'ihavefoundit.webp',images:['ihavefoundit.webp','picture2.jpg','picture2.jpg'],description:'Discover the essence of finding what matters most in this stunning piece.'},
-    'bliss':{title:'Bliss (2019)',artist:'Samantha Ellis',price:'£769.00',image:'bliss.png',images:['bliss.png','bliss (2019)_frame.png','bliss (2019)_pre.png'],description:'A serene exploration of pure happiness and peaceful moments.'},
-    'findmethemoon':{title:'Find Me the Moon (2022)',artist:'Samantha Ellis',price:'£330.00',image:'find me the moon (2022).webp',images:['find me the moon (2022).webp','find me the moon (2022)_frame.png','find me the moon (2022)_pre.png'],description:'A dreamy nocturnal piece celebrating celestial beauty.'},
-    'fordad':{title:'For Dad (2021)',artist:'Samantha Ellis',price:'£769.00',image:'fordad.webp',images:['fordad.webp','for dad (2021)_frame.png','for dad (2021)_pre.png'],description:'A tribute to cherished moments and special bonds.'},
-    'beyondwords':{title:'Beyond Words (2019)',artist:'Samantha Ellis',price:'£300.00',image:'beyond words (2019).webp',images:['beyond words (2019).webp','beyond words (2019)_frame.png','beyond words (2019)_pre.png'],description:'Expressive artwork that transcends verbal communication.'},
-    'wehope':{title:'We Hope (2020)',artist:'Samantha Ellis',price:'£260.00',image:'we can only hope.png',images:['we can only hope.png','we can only hope (2019)_pre.png','we can only hope (2019)_pre.png'],description:'An inspiring piece celebrating hope and possibilities.'},
-    'candyclouds':{title:'Candy Floss Clouds (2019)',artist:'Samantha Ellis',price:'£380.00',image:'candy floss clouds (2019).webp',images:['candy floss clouds (2019).webp','candy floss clouds (2019)_frame.png','candy floss clouds (2019)_pre.png'],description:'Whimsical clouds rendered in delightful colors.'}
-  };
-  
   trendingQuickViewButtons.forEach((btn)=>{
     btn.addEventListener('click',(e)=>{
       e.preventDefault();
@@ -654,17 +684,17 @@ if(trendingCarousel){
       if(!productCard) return;
       
       const productId=productCard.getAttribute('data-product-id');
-      const product=productId?trendingProductData[productId]:null;
-      
+      const product=productId?PRODUCTS[productId]:null;
+
       if(product && modal){
         // Update modal content
         const modalGalleryImages=product.images||[product.image];
         const modalImgEl=document.getElementById('trendingModalProductImage');
-        
+
         if(modalImgEl) modalImgEl.src=modalGalleryImages[0];
         document.getElementById('trendingModalArtistName').textContent=product.artist;
         document.getElementById('trendingModalProductTitle').textContent=product.title;
-        document.getElementById('trendingModalPrice').textContent=product.price;
+        document.getElementById('trendingModalPrice').textContent=formatPrice(product.price);
         document.getElementById('trendingModalDescription').textContent=product.description;
         
         // Store modal gallery data on window for nav buttons to use
@@ -795,51 +825,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   const isProductDetailPage = !!document.querySelector('.product-detail-page');
   
   if(isProductDetailPage){
-    const productDetailData={
-      'ivefoundit':{title:"I've Found It (2022)",artist:'Samantha Ellis',price:'£769',image:'ihavefoundit.webp',images:['ihavefoundit.webp','ihavefoundit.webp','ihavefoundit.webp'],medium:'Oil on hand made Canvas',size:'100 × 100 cm',rating:'4.8',status:'Available',imageSize:'100x100',frameColor:'Black',description:"A striking representation of discovery and achievement. This piece captures a moment of realization with bold brushwork and vibrant color transitions that draw the viewer's eye to the central focal point."},
-      'ifoundit':{title:'I Found It (2022)',artist:'Samantha Ellis',price:'£769',image:'ihavefoundit.webp',images:['ihavefoundit.webp','picture2.jpg','picture2.jpg'],medium:'Oil on Canvas',size:'100 × 100 cm',rating:'4.8',status:'Available',imageSize:'100x100',frameColor:'Black',description:'Discover the essence of finding what matters most in this stunning piece.'},
-      'bliss':{title:'Bliss (2019)',artist:'Samantha Ellis',price:'£769',image:'bliss.png',images:['bliss.png','bliss (2019)_frame.png','bliss (2019)_pre.png'],medium:'Oil on Canvas',size:'100 × 100 cm',rating:'4.9',status:'Available',imageSize:'100x100',frameColor:'Black',description:'A serene exploration of pure happiness and peaceful moments.'},
-      'kourtney':{title:'Kourtney (2019)',artist:'Samantha Ellis',price:'£769',image:'kourtney.png',images:['kourtney.png','Kourtney (2019)_frame.png','Kourtney (2019)_pre.png'],medium:'Oil on hand made Canvas',size:'100 × 100 cm',rating:'4.7',status:'Available',imageSize:'100x100',frameColor:'Black',description:'A vibrant portrait study that captures the essence of its subject with expressive brushwork and rich, dynamic colors that bring the figure to life.'},
-      'fordad':{title:'For Dad (2021)',artist:'Samantha Ellis',price:'£769',image:'fordad.webp',images:['fordad.webp','for dad (2021)_frame.png','for dad (2021)_pre.png'],medium:'Oil on Canvas',size:'100 × 100 cm',rating:'4.8',status:'Available',imageSize:'100x100',frameColor:'Black',description:'A tribute to cherished moments and special bonds.'},
-      'ivefoundit-i':{title:"I've Found It I (2022)",artist:'Samantha Ellis',price:'£769',image:"i’ve found it i.webp",images:["i’ve found it i.webp","find me the moon i (2022) _frame.png","find me the moon i (2022)_pre.png"],medium:'Oil on Canvas',size:'120 × 100 cm',rating:'4.6',status:'Available',imageSize:'120x100',frameColor:'White',description:'A compelling variation on the discovery theme. This piece explores similar concepts through a different lens, with careful composition and thoughtful color choices.'},
-      'european-championship':{title:'European Women\'s Championship (July 31st 2022)',artist:'Samantha Ellis',price:'£769',image:"european women’s championship.webp",images:["european women’s championship.webp","european women’s championship (july 31st 2022)_frame.png","european women’s championship (july 31st 2022)_pre.png"],medium:'Acrylic on Canvas',size:'100 × 100 cm',rating:'4.5',status:'Available',imageSize:'100x100',frameColor:'Black',description:'A dynamic celebration of athletic achievement and female empowerment. The energetic brushwork and bold color palette convey movement and triumph.'},
-      'illlookup':{title:"I'll Look Up Forever",artist:'Samantha Ellis',price:'£769',image:"i’ll look up forever.webp",images:["i’ll look up forever.webp","find me the moon i (2022) _frame.png","find me the moon i (2022)_pre.png"],medium:'Mixed Media on Canvas',size:'100 × 150 cm',rating:'4.7',status:'Available',imageSize:'100x150',frameColor:'Black',description:'An uplifting composition that speaks to hope and aspiration. The vertical composition draws the eye upward, creating a sense of reaching toward something meaningful.'},
-      'wehope':{title:'We Hope (2020)',artist:'Samantha Ellis',price:'£260',image:'we can only hope.png',images:['we can only hope.png','we can only hope (2019)_frame.png','we can only hope (2019)_pre.png'],medium:'Oil on Canvas',size:'80 × 100 cm',rating:'4.6',status:'Available',imageSize:'80x100',frameColor:'White',description:'An inspiring piece celebrating hope and possibilities.'},
-      'wecanhope':{title:'We Can Only Hope',artist:'Samantha Ellis',price:'£260',image:'we can only hope.png',images:['we can only hope.png','we can only hope (2019)_frame.png','we can only hope (2019)_pre.png'],medium:'Oil on Canvas',size:'80 × 100 cm',rating:'4.6',status:'Available',imageSize:'80x100',frameColor:'White',description:'A thoughtful meditation on optimism and possibility. The careful arrangement of forms and subtle color transitions create an atmosphere of quiet resilience.'},
-      'kourtney-vertical':{title:'Kourtney (2019)',artist:'Samantha Ellis',price:'£769',image:'kourtney.png',images:['kourtney.png','picture2.jpg','picture2.jpg'],medium:'Watercolor on Paper',size:'80 × 120 cm',rating:'4.5',status:'Available',imageSize:'80x120',frameColor:'Black',description:'A portrait study rendered in luminous watercolor. The vertical orientation and fluid technique create an elegant and refined presentation.'},
-      'beyond-words':{title:'Beyond Words (2019)',artist:'Samantha Ellis',price:'£300',image:'beyond words (2019).webp',images:['beyond words (2019).webp','beyond words (2019)_frame.png','beyond words (2019)_pre.png'],medium:'Mixed Media on Canvas',size:'100 × 120 cm',rating:'4.8',status:'Available',imageSize:'100x120',frameColor:'Black',description:'An abstract exploration that transcends literal representation. The layering of materials and techniques creates depth and visual interest that invites contemplation.'},
-      'untitled-ii':{title:'Untitled II (2019)',artist:'Samantha Ellis',price:'£220',image:'untitled ii (2019).webp',images:['untitled ii (2019).webp','untitled ii (2019)_frame.png','untitled ii (2019)_pre.png'],medium:'Acrylic on Canvas',size:'80 × 120 cm',rating:'4.4',status:'Available',imageSize:'80x120',frameColor:'Black',description:'A minimalist composition that relies on form and color to convey meaning. The restrained palette allows the viewer to focus on the essential elements.'},
-      'candyclouds':{title:'Candy Floss Clouds (2019)',artist:'Samantha Ellis',price:'£380',image:'candy floss clouds (2019).webp',images:['candy floss clouds (2019).webp','candy floss clouds (2019)_frame.png','candy floss clouds (2019)_pre.png'],medium:'Oil on Canvas',size:'100 × 100 cm',rating:'4.9',status:'Available',imageSize:'100x100',frameColor:'Black',description:'Whimsical clouds rendered in delightful colors.'},
-      'candyfloss-clouds':{title:'Candy Floss Clouds (2019)',artist:'Samantha Ellis',price:'£380',image:'candy floss clouds (2019).webp',images:['candy floss clouds (2019).webp','picture2.jpg','picture2.jpg'],medium:'Oil on Canvas',size:'100 × 100 cm',rating:'4.9',status:'Available',imageSize:'100x100',frameColor:'Black',description:'A dreamlike landscape capturing the ethereal beauty of the sky. The soft, pastel tones and flowing shapes create an atmosphere of wonder and beauty.'},
-      'findmethemoon':{title:'Find Me the Moon (2022)',artist:'Samantha Ellis',price:'£330',image:'find me the moon (2022).webp',images:['find me the moon (2022).webp','find me the moon (2022)_frame.png','find me the moon (2022)_pre.png'],medium:'Oil on Canvas',size:'120 × 80 cm',rating:'4.7',status:'Available',imageSize:'120x80',frameColor:'Black',description:'A dreamy nocturnal piece celebrating celestial beauty.'},
-      'findmethemoon-i':{title:'Find Me the Moon I (2022)',artist:'Samantha Ellis',price:'£340',image:'find me the moon i (2022).webp',images:['find me the moon i (2022).webp','find me the moon i (2022)_frame.png','find me the moon i (2022)_pre.png'],medium:'Oil on Canvas',size:'100 × 100 cm',rating:'4.8',status:'Available',imageSize:'100x100',frameColor:'Black',description:'A variation on the lunar theme with emphasis on romantic atmosphere. The composition and color harmony create an inviting and emotionally resonant work.'},
-      'wellingborough':{title:'Wellingborough (2020)',artist:'Samantha Ellis',price:'£320',image:'wellingborough (2020).webp',images:['wellingborough (2020).webp','wellingborough (2020)_frame.png','wellingborough (2020)_pre.png'],medium:'Oil on Canvas',size:'120 × 90 cm',rating:'4.6',status:'Available',imageSize:'120x90',frameColor:'Black',description:'A landscape study inspired by the English countryside. The careful attention to light and atmosphere brings the scene to life with authenticity and charm.'},
-      'hurricane-maria':{title:'Hurricane Maria (2020)',artist:'Samantha Ellis',price:'£400',image:'hurricane maria (2020).png',images:['hurricane maria (2020).png','hurricane maria (2020)_frame.png','hurricane maria (2020)_pre.png'],medium:'Oil on Canvas',size:'120 × 100 cm',rating:'4.9',status:'Available',imageSize:'120x100',frameColor:'Black',description:'A powerful and dynamic composition addressing themes of natural forces and resilience. The dramatic composition and intense colors convey movement and emotion.'},
-      'hurricane-katrina':{title:'Hurricane Katrina (2020)',artist:'Samantha Ellis',price:'£360',image:'hurricane katrina (2020).webp',images:['hurricane katrina (2020).webp','hurricane katrina (2020)_frame.png','hurricane katrina (2020)_pre.png'],medium:'Mixed Media on Canvas',size:'100 × 120 cm',rating:'4.5',status:'Available',imageSize:'100x120',frameColor:'Black',description:'An impactful work exploring the aftermath and recovery from natural disaster. The composition reflects on themes of loss and renewal.'},
-      'storm-andre':{title:'Storm André (2020)',artist:'Samantha Ellis',price:'£360',image:'storm andré (2020).png',images:['storm andré (2020).png','storm andré (2020)_frame.png','storm andré (2020)_pre.png'],medium:'Oil on Canvas',size:'100 × 120 cm',rating:'4.6',status:'Available',imageSize:'100x120',frameColor:'Black',description:'A dramatic depiction of atmospheric turbulence. The artist captures the raw power and beauty of nature\'s forces with commanding brushwork.'},
-      'mount-lamington':{title:'Mount Lamington (2020)',artist:'Samantha Ellis',price:'£360',image:'mount lamington (2020).png',images:['mount lamington (2020).png','mount lamington (2020)_frame.png','mount lamington (2020)_pre.png'],medium:'Oil on Canvas',size:'120 × 100 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'A majestic landscape study of an iconic volcanic peak. The composition emphasizes the grandeur and geological significance of the mountain.'},
-      'mount-sinabung':{title:'Mount Sinabung (2018)',artist:'Samantha Ellis',price:'£360',image:'mount sinabung (2018).png',images:['mount sinabung (2018).png','mount sinabung (2018)_frame.png','mount sinabung (2018)_pre.png'],medium:'Oil on Canvas',size:'100 × 120 cm',rating:'4.5',status:'Available',imageSize:'100x120',frameColor:'Black',description:'A contemplative rendering of an active volcano. The dynamic composition captures the tension between stillness and turbulent geological forces.'},
-      'mount-st-helens':{title:'Mount St. Helens (2020)',artist:'Samantha Ellis',price:'£360',image:'mount st. helens (2020).webp',images:['mount st. helens (2020).webp','mount st. helens (2020)_frame.png','mount st. helens (2020)_pre.png'],medium:'Oil on Canvas',size:'120 × 90 cm',rating:'4.8',status:'Available',imageSize:'120x90',frameColor:'Black',description:'A historical landscape study of Mount St. Helens. The painting commemorates this significant natural landmark with reverence and artistic excellence.'},
-      'great-smog-1952':{title:'The Great Smog of 1952 (2020)',artist:'Samantha Ellis',price:'£360',image:'the great smog of 1952 (2020).webp',images:['the great smog of 1952 (2020).webp','the great smog of 1952 (2020)_frame.png','the great smog of 1952 (2020)_pre.png'],medium:'Mixed Media on Canvas',size:'100 × 120 cm',rating:'4.6',status:'Available',imageSize:'100x120',frameColor:'Black',description:'A historically inspired work reflecting on the London smog event. The composition uses color and form to evoke the environmental and human impact of this tragedy.'},
-      'australian-fires-2020':{title:'Australian Fires (2020)',artist:'Samantha Ellis',price:'£769',image:'australian fires (2020).webp',images:['australian fires (2020).webp','australian fires (2020)_frame.png','australian fires (2020)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Painted in response to the record-breaking fires of 2019–20, which killed over 25 people, destroyed 46 million acres, and wiped out over 1 billion animals. The work stands as both a tribute and a warning.'},
-      'icant-lift-my-head-2021':{title:'I Can’t Lift My Head (2021)',artist:'Samantha Ellis',price:'£459',image:'i can’t lift my head (2021).webp',images:['i can’t lift my head (2021).webp','i can’t lift my head (2021)_frame.png','i can’t lift my head (2021)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Painted in response to the record-breaking fires of 2019–20, which killed over 25 people, destroyed 46 million acres, and wiped out over 1 billion animals. The work stands as both a tribute and a warning.'},
-      'contrasting-waves-2017':{title:'contrasting-waves-2017',artist:'Samantha Ellis',price:'£219',image:'contrasting waves (2017).webp',images:['contrasting waves (2017).webp','contrasting waves (2017)_frame.png','contrasting waves (2017)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:': A vivid study of the meeting point between chaos and calm. Sweeping, energetic strokes capture the restless movement of waves, while the horizon offers a moment of stillness. The interplay of colour creates a rhythm that speaks to the eternal pull between motion and tranquillity.'},
-      'untitled2019':{title:'untitled 2019',artist:'Samantha Ellis',price:'£120',image:'untitled (2019)_pre.png',images:['untitled (2019)_pre.png','untitled (2019)_frame.png','untitled (2019)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'A spontaneous composition where acrylic washes merge with the raw texture of chalk and the precision of graphite lines. This piece balances gestural freedom with delicate mark-making, allowing the paper’s surface to become an active participant in the work.'},
-      'untitled-I-2019':{title:'untitled I 2019',artist:'Samantha Ellis',price:'£120',image:'untitled i (2019)_pre.png',images:['untitled i (2019)_pre.png','untitled i (2019)_frame.png','untitled i (2019)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Layered with shifting tones and tactile marks, these drawing captures the energy of movement and the pause of stillness in a single frame. The interplay between opaque acrylic passages and translucent chalk whispers creates a rhythm both fragile and assured.'},
-      'Charles Darwin':{title:'Charles Darwin',artist:'Samantha Ellis',price:'£1,115',image:'charles darwin (24th november 1859) (2022).jpg',images:['charles darwin (24th november 1859) (2022).jpg','charles darwin (24th november 1859) (2022)_frame.png','charles darwin (24th november 1859) (2022)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'This work charts the stars on the day Charles Darwin published On the Origin of Species, a moment that reshaped humanity’s understanding of life itself. The composition evokes the vastness of time and discovery and remembers a moment that changed the world forever.  '},
-      'Emily Davision':{title:'Emily Davision',artist:'Samantha Ellis',price:'£900',image:'emily davison (4th june 1913) (2022).webp',images:['emily davison (4th june 1913) (2022).webp','emily davison (4th june 1913) (2022)_frame.png','emily davison (4th june 1913) (2022)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Painted from the cloud formations present when suffragette Emily Davison stepped onto the racetrack at the Epsom Derby, this work honours a defining act of courage in the fight for women’s rights. Soft yet unyielding, the sky becomes a silent witness to a moment that would echo through history.'},
-      'Emmett Till':{title:'Emmett Till',artist:'Samantha Ellis',price:'£900',image:'emmett till (21st august 1955) (2022).webp',images:['emmett till (21st august 1955) (2022).webp','emmett till (21st august 1955) (2022)_frame.png','emmett till (21st august 1955) (2022)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:' This piece reflects the clouds above on the day 14-year-old Emmett Till entered a Mississippi store, an event that would lead to his brutal murder and galvanise the civil rights movement, because of Emmett’s mother Mammie Till the world would see the devastating reactions to racisms in America and would never be the same again. '},
-      'Yuri Gagarin':{title:'Yuri Gagarin',artist:'Samantha Ellis',price:'£899',image:'yuri gagarin (12th april 1961) (2022).webp',images:['yuri gagarin (12th april 1961) (2022).webp','yuri gagarin (12th april 1961) (2022)_frame.png','yuri gagarin (12th april 1961) (2022)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Capturing the precise star configuration at the moment Yuri Gagarin became the first human in space, this painting offers a cosmic vantage point on a triumph of exploration. It merges scientific precision with artistic interpretation, honouring humanity’s first steps beyond Earth.'},
-      'Stonewall Riots':{title:'Stonewall Riots',artist:'Samantha Ellis',price:'£959',image:'stonewall riots (27th june 1969) (2022).webp',images:['stonewall riots (27th june 1969) (2022).webp','stonewall riots (27th june 1969) (2022)_frame.png','stonewall riots (27th june 1969) (2022)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Painted from the star chart above New York City on the night the Stonewall Riots began, this work commemorates a pivotal moment in LGBTQ+ history. Against the calm of the night sky, it speaks to defiance, resilience, and the enduring struggle for equality. A moment etched in time forever to be remembered for the braveness and strength of those involved. '},
-      'Sarah Everard':{title:'sarah Everard',artist:'Samantha Ellis',price:'£1049',image:'sarah everard (12th march 2021) (2022).webp',images:['sarah everard (12th march 2021) (2022).webp','sarah everard (12th march 2021) (2022)_frame.png','sarah everard (12th march 2021) (2022)_pre.png'],medium:'Oil on Canvas',size:'50 × 50 cm',rating:'4.7',status:'Available',imageSize:'120x100',frameColor:'Black',description:'Based on the cloud formation from the day the artist learned of Sarah Everard’s murder, this painting is a poignant reminder of the ongoing fight for women’s safety. The painting was created as a time stamp for women to always remember Sarah and all other women who have been subjected to abuse and harm at the result of men'}
-      
-      
-    
-    };
-    
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('product') || urlParams.get('id') || 'ethereal-light';
-    const product = productDetailData[productId];
+    const product = PRODUCTS[productId];
 
     const statusEl = document.getElementById('productStatus');
     const addToCartBtn = document.getElementById('addToCartBtn');
@@ -850,7 +838,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     function refreshSoldState(){
       const sold = !!product && SOLD_PRODUCT_IDS.includes(productId);
       if(statusEl){
-        statusEl.textContent = sold ? 'Sold' : (product ? (product.status || 'Available') : '');
+        statusEl.textContent = sold ? 'Sold' : (product ? 'Available' : '');
         statusEl.classList.toggle('sold', sold);
       }
       if(addToCartBtn){
@@ -865,19 +853,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     function buildCartItem(){
       const qtyInput = document.getElementById('qtyInput');
       const qty = parseInt(qtyInput?.value || 1);
-      const size = document.getElementById('sizeSelect')?.value || '100 × 100 cm';
-      const frame = document.getElementById('frameSelect')?.value || 'Black';
 
       return {
         id: productId,
         productKey: productId,
         title: product.title,
         artist: product.artist,
-        price: product.price,
+        price: formatPrice(product.price),
         image: product.image,
         qty: qty,
-        size: size,
-        frame: frame
+        size: product.size,
+        frame: product.frame
       };
     }
 
@@ -885,22 +871,57 @@ document.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('productTitle').textContent = product.title;
       document.getElementById('productTitleAbout').textContent = product.title + ' by ' + product.artist;
       document.getElementById('productArtist').textContent = 'by ' + product.artist;
-      document.getElementById('productPrice').textContent = product.price;
+      document.getElementById('productPrice').textContent = formatPrice(product.price);
       document.getElementById('productImage').src = product.image;
       document.getElementById('productDescription').textContent = product.description;
       document.getElementById('productMedium').textContent = product.medium;
       document.getElementById('productSize').textContent = product.size;
-
-      // Add the new fields
-      const ratingEl = document.getElementById('productRating');
-      const imageSizeEl = document.getElementById('productImageSize');
-      const frameColorEl = document.getElementById('productFrameColor');
-
-      if(ratingEl) ratingEl.textContent = product.rating + ' / 5.0';
-      if(imageSizeEl) imageSizeEl.textContent = product.imageSize + ' px';
-      if(frameColorEl) frameColorEl.textContent = product.frameColor;
-
       document.title = product.title + ' - SAMANTHA';
+
+      // Optional "Further Reading and Information" + "References" sections - only a
+      // handful of exhibition pieces have researched background info for these, so the
+      // "Read more" link and the panel it reveals stay hidden when a product has neither.
+      const readMoreLink = document.getElementById('readMoreLink');
+      const productExtra = document.getElementById('productExtra');
+      const furtherReadingBlock = document.getElementById('furtherReadingBlock');
+      const furtherReadingList = document.getElementById('productFurtherReading');
+      const referencesBlock = document.getElementById('referencesBlock');
+      const referencesList = document.getElementById('productReferences');
+
+      const hasFurtherReading = Array.isArray(product.furtherReading) && product.furtherReading.length > 0;
+      const hasReferences = Array.isArray(product.references) && product.references.length > 0;
+
+      if(hasFurtherReading && furtherReadingList){
+        furtherReadingList.innerHTML = product.furtherReading.map(item => {
+          const label = (item && item.text) ? item.text : item;
+          const url = item && item.url;
+          return url
+            ? `<li><a href="${url}" target="_blank" rel="noopener">${label}</a></li>`
+            : `<li>${label}</li>`;
+        }).join('');
+        furtherReadingBlock.hidden = false;
+      }
+
+      if(hasReferences && referencesList){
+        referencesList.innerHTML = product.references.map(ref => {
+          const label = (ref && ref.text) ? ref.text : ref;
+          const url = ref && ref.url;
+          return url
+            ? `<li>${label} Available from: <a href="${url}" target="_blank" rel="noopener">${url}</a></li>`
+            : `<li>${label}</li>`;
+        }).join('');
+        referencesBlock.hidden = false;
+      }
+
+      if(readMoreLink && (hasFurtherReading || hasReferences)){
+        readMoreLink.hidden = false;
+        readMoreLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          const isOpen = !productExtra.hidden;
+          productExtra.hidden = isOpen;
+          readMoreLink.textContent = isOpen ? 'Read more' : 'Read less';
+        });
+      }
     }
 
     refreshSoldState();
@@ -933,11 +954,13 @@ document.addEventListener('DOMContentLoaded',()=>{
       });
     }
 
-    // Buy Now - add to cart and go straight to checkout
+    // Buy Now - checkout with just this item, without touching the persistent cart
+    // (previously called addToCart(), so checkout showed this item mixed in with
+    // whatever else was already sitting in the cart)
     if(buyNowBtn){
       buyNowBtn.addEventListener('click',()=>{
         if(SOLD_PRODUCT_IDS.includes(productId)) return;
-        addToCart(buildCartItem());
+        sessionStorage.setItem('buyNowItem', JSON.stringify(buildCartItem()));
         window.location.href = 'checkout.html';
       });
     }
@@ -989,16 +1012,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   quickViewButtons = Array.from(quickViewButtons).filter(btn => !btn.closest('.featured-carousel') && !btn.closest('.trending-carousel'));
   const addToCartBtn = isShopPage ? null : document.getElementById('addToCartBtn');
 
-  const productData={
-    'rodeo':{title:'Rodeo',artist:'Sam Dougherty',price:'$200.00',image:'assets/rodeo.jpg',images:['assets/rodeo.jpg','Picture2.jpg','Picture2.jpg'],description:'Black and white film photograph capturing a moment at the rodeo.'},
-    'teeber-rodeo':{title:'Teeber Rodeo',artist:'Sam Dougherty',price:'$350.00',image:'assets/teeber-rodeo.jpg',images:['assets/teeber-rodeo.jpg','Picture2.jpg','Picture2.jpg'],description:'A dynamic scene from the teeber rodeo event.'},
-    'top-of-innsbruck':{title:'Top of Innsbruck',artist:'Sam Dougherty',price:'$280.00',image:'assets/top-of-innsbruck.jpg',images:['assets/top-of-innsbruck.jpg','Picture2.jpg','Picture2.jpg'],description:'Landscape photography from the top of Innsbruck mountains.'},
-    'innsbruck':{title:'Innsbruck',artist:'Sam Dougherty',price:'$250.00',image:'assets/painting.jpg',images:['assets/painting.jpg','Picture2.jpg','Picture2.jpg'],description:'Artistic interpretation of the beautiful Innsbruck region.'},
-    'gallery-frame':{title:'Gallery Frame',artist:'Mark Johnson',price:'$270.00',image:'Ihavefoundit2022.jpg',images:['Ihavefoundit2022.jpg','Picture2.jpg','Picture2.jpg'],description:'Elegant gallery-style framed piece with rich black frame and horizontal presentation.'},
-    'vertical-frame':{title:'Vertical Frame',artist:'Lisa Wong',price:'$275.00',image:'Ihavefoundit2022.jpg',images:['Ihavefoundit2022.jpg','Picture2.jpg','Picture2.jpg'],description:'Stunning vertical frame composition with classic black frame and portrait orientation.'}
-  };
-
-  let currentProductKey='rodeo';
+  let currentProductKey=null;
   // Modal gallery state
   let modalGalleryImages = [];
   let modalGalleryIndex = 0;
@@ -1067,35 +1081,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  // Setup product frame clicks for navigation on home page
-  if(!isShopPage){
-    const productTitleToId={
-      'Rodeo':'rodeo',
-      'Teeber Rodeo':'teeber-rodeo',
-      'Top of Innsbruck':'top-of-innsbruck',
-      'Sunset Dreams':'sunset-dreams',
-      'Mountain Whispers':'mountain-whispers',
-      'Urban Pulse':'urban-pulse',
-      'Ethereal Light':'ethereal-light',
-      'Ocean Serenity':'ocean-serenity'
-    };
-    
-    const homeProductFrames=document.querySelectorAll(':not(.shop-page) .carousel-item .product-frame');
-    homeProductFrames.forEach((frame)=>{
-      frame.style.cursor = 'pointer';
-      frame.addEventListener('click',(e)=>{
-        if(e.target.closest('.quick-view button')){
-          return;
-        }
-        
-        const productCard=frame.closest('.product-card');
-        const title=productCard?.querySelector('.product-title')?.textContent?.trim()||'Rodeo';
-        const productId=productTitleToId[title]||'rodeo';
-        window.location.href=`product-detail.html?id=${productId}`;
-      });
-    });
-  }
-
   // Close button
   if(closeBtn){
     closeBtn.addEventListener('click',closeModal);
@@ -1130,23 +1115,26 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Add to cart
   if(addToCartBtn){
     addToCartBtn.addEventListener('click',()=>{
+      const productId=window.currentFeaturedProductId;
+      const product=productId?PRODUCTS[productId]:null;
+      if(!product) return;
+
       const qty=parseInt(qtyInput?.value||1);
       const size=document.getElementById('sizeSelect')?.value||'20cm x 30cm';
       const frame=document.getElementById('frameSelect')?.value||'Black';
-      
-      const product=productData[currentProductKey];
+
       const cartItem={
-        id:currentProductKey,
-        productKey:currentProductKey,
+        id:productId,
+        productKey:productId,
         title:product.title,
         artist:product.artist,
-        price:product.price,
+        price:formatPrice(product.price),
         image:product.image,
         qty:qty,
         size:size,
         frame:frame
       };
-      
+
       addToCart(cartItem);
       closeModal();
     });
@@ -1174,140 +1162,6 @@ document.addEventListener('DOMContentLoaded',()=>{
           }
         });
       }
-    });
-  }
-
-  // Trending Section Modal
-  const modalTrending=document.getElementById('quickViewModalTrending');
-  const closeBtnTrending=document.getElementById('closeModalTrending');
-  const trendingQuickViewButtons=document.querySelectorAll('.trending-gallery-section .quick-view button');
-  const addToCartBtnTrending=document.getElementById('addToCartBtnTrending');
-
-  const trendingProductData={
-    'sunset-dreams':{title:'Sunset Dreams',artist:'Elena Martinez',price:'$280.00',image:'assets/painting.jpg',description:'A breathtaking sunset artwork capturing the beauty of nature.'},
-    'mountain-whispers':{title:'Mountain Whispers',artist:'James Chen',price:'$320.00',image:'assets/top-of-innsbruck.jpg',description:'Mountain landscape photography with stunning detail.'},
-    'urban-pulse':{title:'Urban Pulse',artist:'Maya Patel',price:'$250.00',image:'assets/teeber-rodeo.jpg',description:'Contemporary urban art piece.'},
-    'ethereal-light':{title:'Ethereal Light',artist:'Lucas Rivera',price:'$290.00',image:'assets/rodeo.jpg',description:'An ethereal and mystical artwork.'}
-  };
-
-  let currentTrendingProductKey='sunset-dreams';
-
-  function openModalTrending(){
-    if(modalTrending){
-      modalTrending.classList.add('active');
-    }
-  }
-
-  function closeModalTrending(){
-    if(modalTrending){
-      modalTrending.classList.remove('active');
-    }
-  }
-
-  function updateModalContentTrending(productKey){
-    const product=trendingProductData[productKey];
-    if(!product) return;
-    document.getElementById('modalProductImageTrending').src=product.image;
-    document.getElementById('modalArtistNameTrending').textContent=product.artist;
-    document.getElementById('modalProductTitleTrending').textContent=product.title;
-    document.getElementById('modalPriceTrending').textContent=product.price;
-    document.getElementById('modalDescriptionTrending').textContent=product.description;
-  }
-
-  // Setup trending quick view buttons
-  trendingQuickViewButtons.forEach((btn)=>{
-    btn.addEventListener('click',(e)=>{
-      e.preventDefault();
-      const productCard=btn.closest('.product-card');
-      if(!productCard) return;
-      
-      const title=productCard.querySelector('.product-title')?.textContent||'Sunset Dreams';
-      const productKey=Object.keys(trendingProductData).find(key=>trendingProductData[key].title===title)||'sunset-dreams';
-      currentTrendingProductKey=productKey;
-      
-      updateModalContentTrending(productKey);
-      openModalTrending();
-    });
-  });
-
-  // Setup trending product frame clicks for navigation
-  if(!isShopPage){
-    const trendingProductTitleToId={
-      'Sunset Dreams':'sunset-dreams',
-      'Mountain Whispers':'mountain-whispers',
-      'Urban Pulse':'urban-pulse',
-      'Ethereal Light':'ethereal-light'
-    };
-    
-    const trendingProductFrames=document.querySelectorAll('.trending-gallery-section .product-frame');
-    trendingProductFrames.forEach((frame)=>{
-      frame.style.cursor = 'pointer';
-      frame.addEventListener('click',(e)=>{
-        if(e.target.closest('.quick-view button')){
-          return;
-        }
-        
-        const productCard=frame.closest('.product-card');
-        const title=productCard?.querySelector('.product-title')?.textContent?.trim()||'Sunset Dreams';
-        const productId=trendingProductTitleToId[title]||'sunset-dreams';
-        window.location.href=`product-detail.html?id=${productId}`;
-      });
-    });
-  }
-
-  // Close trending button
-  if(closeBtnTrending){
-    closeBtnTrending.addEventListener('click',closeModalTrending);
-  }
-
-  // Close trending modal on Escape key
-  document.addEventListener('keydown',(e)=>{
-    if(e.key==='Escape'&&modalTrending?.classList.contains('active')){
-      closeModalTrending();
-    }
-  });
-
-  // Trending quantity controls
-  const qtyPlusTrending=document.getElementById('qtyPlusTrending');
-  const qtyMinusTrending=document.getElementById('qtyMinusTrending');
-  const qtyInputTrending=document.getElementById('qtyInputTrending');
-
-  if(qtyPlusTrending){
-    qtyPlusTrending.addEventListener('click',()=>{
-      if(qtyInputTrending) qtyInputTrending.value=parseInt(qtyInputTrending.value||1)+1;
-    });
-  }
-
-  if(qtyMinusTrending){
-    qtyMinusTrending.addEventListener('click',()=>{
-      if(qtyInputTrending&&parseInt(qtyInputTrending.value||1)>1){
-        qtyInputTrending.value=parseInt(qtyInputTrending.value)-1;
-      }
-    });
-  }
-
-  // Add to cart - trending
-  if(addToCartBtnTrending){
-    addToCartBtnTrending.addEventListener('click',()=>{
-      const qty=parseInt(qtyInputTrending?.value||1);
-      const size=document.getElementById('sizeSelectTrending')?.value||'20cm x 30cm';
-      const frame=document.getElementById('frameSelectTrending')?.value||'Black';
-      
-      const product=trendingProductData[currentTrendingProductKey];
-      const cartItem={
-        id:currentTrendingProductKey,
-        productKey:currentTrendingProductKey,
-        title:product.title,
-        artist:product.artist,
-        price:product.price,
-        image:product.image,
-        qty:qty,
-        size:size,
-        frame:frame
-      };
-      
-      addToCart(cartItem);
-      closeModalTrending();
     });
   }
 
@@ -1343,7 +1197,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       // Build inline panel
       const title = card.querySelector('.product-title')?.textContent?.trim()||'Item';
       const artist = card.querySelector('.artist-name')?.textContent?.trim()||'';
-      const priceText = card.querySelector('.product-price')?.textContent?.replace('From ','').trim()||'$0.00';
+      const priceText = card.querySelector('.product-price')?.textContent?.replace('From ','').trim()||'£0.00';
       const imgSrc = card.querySelector('img')?.src||'';
 
       const panel = document.createElement('div');
@@ -1405,11 +1259,13 @@ document.addEventListener('DOMContentLoaded',()=>{
       ivMinus?.addEventListener('click', ()=>{ if(parseInt(ivInput.value||1)>1) ivInput.value = parseInt(ivInput.value)-1; });
       ivClose?.addEventListener('click', ()=>{ closeOpenPanel(); });
 
+      const cardProductId = card.getAttribute('data-product-id');
+
       ivAdd?.addEventListener('click', ()=>{
         const qty = parseInt(ivInput.value||1);
         const size = panel.querySelector('.iv-size')?.value||'20cm x 30cm';
         const frame = panel.querySelector('.iv-frame')?.value||'Black';
-        const cartItem = { id: title, productKey: title, title: title, artist: artist, price: priceText, image: imgSrc, qty: qty, size: size, frame: frame };
+        const cartItem = { id: cardProductId, productKey: cardProductId, title: title, artist: artist, price: priceText, image: imgSrc, qty: qty, size: size, frame: frame };
         addToCart(cartItem);
         closeOpenPanel();
       });
@@ -1420,11 +1276,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       const panelImgEl = panel.querySelector('.modal-product-image');
       let panelGallery = [];
       let panelIndex = 0;
-      // try to find product data by title
-      const lookupTitle = title;
-      const matchedKey = Object.keys(productData).find(k=>productData[k].title===lookupTitle);
-      if(matchedKey && productData[matchedKey]){
-        panelGallery = (Array.isArray(productData[matchedKey].images) && productData[matchedKey].images.length) ? productData[matchedKey].images.slice() : [productData[matchedKey].image];
+      const matchedProduct = cardProductId ? PRODUCTS[cardProductId] : null;
+      if(matchedProduct){
+        panelGallery = (Array.isArray(matchedProduct.images) && matchedProduct.images.length) ? matchedProduct.images.slice() : [matchedProduct.image];
       }else{
         panelGallery = [imgSrc, 'picture2.jpg', 'picture2.jpg'];
       }
@@ -1444,64 +1298,73 @@ document.addEventListener('DOMContentLoaded',()=>{
       });
     });
 
-    // Product card navigation to detail page (clicking the card itself, not quick-view)
-    const productTitleToId={
-      'Rodeo':'rodeo',
-      'Teeber Rodeo':'teeber-rodeo',
-      'Top of Innsbruck':'top-of-innsbruck',
-      'Sunset Dreams':'sunset-dreams',
-      'Mountain Whispers':'mountain-whispers',
-      'Urban Pulse':'urban-pulse',
-      'Ethereal Light':'ethereal-light',
-      'Ocean Serenity':'ocean-serenity',
-      'Gallery Frame':'gallery-frame',
-      'Vertical Frame':'vertical-frame',
-      'Abstract Dreams':'abstract-dreams',
-      'Horizons':'horizons',
-      'Moonlight':'moonlight',
-      'Serenity':'serenity',
-      'Wildflower':'wildflower',
-      'Bamboo Grove':'bamboo-grove',
-      'Lavender Fields':'lavender-fields',
-      'Tuscan Hills':'tuscan-hills',
-      'Nordic Lights':'nordic-lights',
-      'Autumn Leaves':'autumn-leaves',
-      'Sunset Beach':'sunset-beach',
-      'Winter Snow':'winter-snow',
-      'Forest Path':'forest-path',
-      'Garden Paradise':'garden-paradise',
-      'City Lights':'city-lights',
-      'Ocean Waves':'ocean-waves',
-      'Mountain Peak':'mountain-peak',
-      'Summer Breeze':'summer-breeze',
-      'Midnight Stars':'midnight-stars',
-      'Starry Night':'starry-night',
-      'Desert Mirage':'desert-mirage'
-    };
-
-    const allProductCards=grid.querySelectorAll('.product-card');
-    allProductCards.forEach((card)=>{
-      const frame=card.querySelector('.product-frame');
-      if(frame){
-        frame.style.cursor = 'pointer';
-        frame.addEventListener('click',(e)=>{
-          // Skip if quick-view button area was clicked
-          if(e.target.closest('.quick-view button')){
-            return;
-          }
-          
-          const title=card.querySelector('.product-title')?.textContent?.trim()||'Rodeo';
-          const productId=productTitleToId[title]||'rodeo';
-          window.location.href=`product-detail.html?id=${productId}`;
-        });
-      }
-    });
+    // Card-click-to-detail-page navigation is handled by the shopProductCards
+    // handler registered above (uses each card's own data-product-id directly).
   }
 
   // Commission Form Functionality - Removed, now uses separate page
 });
 
 // Cart Management System
+
+// Only index.html has the #cartModal markup written out by hand; every other page
+// (product-detail.html, shop-collection.html, ...) has a cart icon but no drawer
+// behind it, so opening the cart there previously did nothing. Inject the same
+// markup on demand so the cart modal exists everywhere script.js runs.
+function ensureCartModal(){
+  if(document.getElementById('cartModal')) return;
+  const wrapper=document.createElement('div');
+  wrapper.innerHTML=`
+    <div id="cartModal" class="cart-modal">
+      <button id="closeCartBtn" class="close-cart-btn">✕</button>
+      <div class="cart-container">
+        <div class="cart-left">
+          <h1>Shopping Cart</h1>
+          <div class="cart-table-header">
+            <div class="col-product">Product</div>
+            <div class="col-price">Price</div>
+            <div class="col-quantity">Quantity</div>
+            <div class="col-total">Total</div>
+          </div>
+          <div id="cartItems" class="cart-items">
+            <p class="empty-cart">Your cart is empty</p>
+          </div>
+        </div>
+        <div class="cart-right">
+          <p class="free-shipping">Congratulations! Your order qualified for free shipping</p>
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="cartTotal">£0.00</span>
+            </div>
+            <p class="summary-note">Excluding taxes and shipping</p>
+          </div>
+          <div class="order-notes">
+            <label>Order Notes</label>
+            <textarea id="orderNotes" placeholder="Add any special instructions or notes here..."></textarea>
+          </div>
+          <label class="terms-checkbox">
+            <input type="checkbox" id="termsCheck">
+            <span>I agree with the terms and conditions</span>
+          </label>
+          <button class="checkout-btn">CHECKOUT</button>
+          <button class="continue-shopping-btn">CONTINUE SHOPPING</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(wrapper.firstElementChild);
+}
+ensureCartModal();
+
+function openCart(){
+  ensureCartModal();
+  const cartModal=document.getElementById('cartModal');
+  if(!cartModal) return;
+  updateCartDisplay();
+  cartModal.classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
 let cart=loadCart();
 updateCartBadge();
 
@@ -1524,9 +1387,8 @@ function addToCart(item){
   }
 
   saveCart();
-  updateCartDisplay();
   updateCartBadge(true);
-  showCartNotification();
+  openCart();
 }
 
 function removeFromCart(id){
@@ -1583,7 +1445,7 @@ function updateCartDisplay(){
   
   if(cart.length===0){
     cartItemsContainer.innerHTML='<p class="empty-cart">Your cart is empty</p>';
-    cartTotal.textContent='$0.00';
+    cartTotal.textContent='£0.00';
   }else{
     cartItemsContainer.innerHTML=cart.map((item,index)=>`
       <div class="cart-item">
@@ -1608,44 +1470,11 @@ function updateCartDisplay(){
     // Calculate total price
     let total=0;
     cart.forEach(item=>{
-      const price=parseFloat(item.price.replace('$',''));
+      const price=parseFloat(item.price.replace(/[^0-9.]/g, ''));
       total+=price*item.qty;
     });
-    cartTotal.textContent='$'+total.toFixed(2);
+    cartTotal.textContent='£'+total.toFixed(2);
   }
-}
-
-let cartToastTimer=null;
-function showCartNotification(){
-  const cartItem=cart[cart.length-1];
-  if(!cartItem) return;
-
-  let toast=document.getElementById('cartToast');
-  if(!toast){
-    toast=document.createElement('div');
-    toast.id='cartToast';
-    toast.className='cart-toast';
-    toast.setAttribute('role','status');
-    toast.setAttribute('aria-live','polite');
-    document.body.appendChild(toast);
-  }
-
-  toast.innerHTML=`
-    <img class="cart-toast-image" src="${cartItem.image||''}" alt="">
-    <div class="cart-toast-text">
-      <div class="cart-toast-title">Added to cart</div>
-      <div class="cart-toast-item">${cartItem.title||''}</div>
-    </div>
-  `;
-
-  toast.classList.remove('show');
-  void toast.offsetWidth; // restart transition
-  toast.classList.add('show');
-
-  clearTimeout(cartToastTimer);
-  cartToastTimer=setTimeout(()=>{
-    toast.classList.remove('show');
-  },2600);
 }
 
 // Cart Button Event Listeners
@@ -1681,7 +1510,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(checkoutBtn){
     checkoutBtn.addEventListener('click',()=>{
       if(cart.length>0){
-        // Navigate to checkout page
+        // Going through the normal cart, not Buy Now - drop any leftover single-item
+        // buy-now selection so checkout shows the full cart, not a stale one-off item.
+        sessionStorage.removeItem('buyNowItem');
         window.location.href='checkout.html';
       }else{
         alert('Your cart is empty!');
@@ -1704,8 +1535,23 @@ document.addEventListener('DOMContentLoaded',()=>{
 document.addEventListener('DOMContentLoaded', ()=>{
   const checkoutForm = document.getElementById('checkoutForm');
   if(checkoutForm){
+    // Buy Now stashes a single item here instead of adding it to the persistent
+    // cart, so checkout can show just that item without merging in whatever else
+    // is already sitting in the cart.
+    let isBuyNow = false;
+    let checkoutItems = loadCart();
+    const buyNowRaw = sessionStorage.getItem('buyNowItem');
+    if(buyNowRaw){
+      try {
+        checkoutItems = [JSON.parse(buyNowRaw)];
+        isBuyNow = true;
+      } catch(e){
+        checkoutItems = loadCart();
+      }
+    }
+
     // load cart overview so order summary is populated
-    loadCheckoutCart();
+    loadCheckoutCart(checkoutItems);
 
     checkoutForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
@@ -1716,8 +1562,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
         if(!key) return;
         formData.append(key, el.value);
       });
-      // attach cart JSON
-      formData.append('cart', JSON.stringify(cart));
+      // attach cart JSON - just the buy-now item, or the whole cart otherwise
+      formData.append('cart', JSON.stringify(checkoutItems));
 
       try {
         const res = await fetch('/submit_order', {
@@ -1730,8 +1576,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
         showSuccess('Order placed successfully!');
         setTimeout(()=>{
-          cart = [];
-          saveCart();
+          if(isBuyNow){
+            sessionStorage.removeItem('buyNowItem');
+          } else {
+            cart = [];
+            saveCart();
+          }
           window.location.href = 'index.html';
         }, 2000);
       } catch(err){
@@ -1824,51 +1674,54 @@ document.addEventListener('DOMContentLoaded', ()=>{
   countryEl.addEventListener('change', ()=> renderStateField(countryEl.value));
 });
 
-// Load cart items on checkout page
-function loadCheckoutCart(){
+// Render the checkout order summary. `items` is the buy-now single item or the
+// full cart (see the checkout DOMContentLoaded handler above); falls back to
+// the persisted cart if called without one.
+function loadCheckoutCart(items){
   const orderItems = document.getElementById('orderItems');
   if(!orderItems) return;
-  
-  cart = loadCart();
-  
-  if(cart.length === 0){
+
+  const checkoutItems = items || loadCart();
+
+  if(checkoutItems.length === 0){
     orderItems.innerHTML = '<p style="text-align: center; color: var(--muted); padding: 20px;">Your cart is empty</p>';
     return;
   }
-  
+
   orderItems.innerHTML = '';
-  cart.forEach(item=>{
+  checkoutItems.forEach(item=>{
     const itemElement = document.createElement('div');
     itemElement.className = 'order-item';
     const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ''));
     const itemTotal = (priceNum * item.qty).toFixed(2);
-    
+
     itemElement.innerHTML = `
       <div class="item-details">
         <div class="item-title">${item.title}</div>
         <div class="item-meta">${item.size} • ${item.frame}</div>
       </div>
-      <div class="item-price">$${itemTotal}</div>
+      <div class="item-price">£${itemTotal}</div>
     `;
     orderItems.appendChild(itemElement);
   });
-  
-  updateCheckoutTotals();
+
+  updateCheckoutTotals(checkoutItems);
 }
 
 // Update totals on checkout page
-function updateCheckoutTotals(){
-  const subtotal = cart.reduce((sum, item)=>{
+function updateCheckoutTotals(items){
+  const checkoutItems = items || loadCart();
+  const subtotal = checkoutItems.reduce((sum, item)=>{
     const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
     return sum + (price * item.qty);
   }, 0);
-  
+
   const tax = subtotal * 0.1; // 10% tax rate
   const total = subtotal + tax;
   
-  document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-  document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
-  document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+  document.getElementById('subtotal').textContent = `£${subtotal.toFixed(2)}`;
+  document.getElementById('tax').textContent = `£${tax.toFixed(2)}`;
+  document.getElementById('total').textContent = `£${total.toFixed(2)}`;
 }
 
 // Calculate total amount for payment
